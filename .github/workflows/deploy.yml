@@ -18,10 +18,16 @@ jobs:
         with:
           node-version: '20'
           
-      - name: Install dependencies
-        # --- LÍNEA MODIFICADA ---
-        # Se añade la bandera --ignore-platform para evitar el error de compatibilidad
-        run: npm ci --ignore-platform
+      - name: Install dependencies (Cross-Platform)
+        # --- SECCIÓN MODIFICADA ---
+        # Este método es más robusto para manejar diferencias de plataforma.
+        # 1. Eliminamos el package-lock.json generado en Windows.
+        # 2. Usamos 'npm install' para generar uno nuevo compatible con Linux.
+        run: |
+          echo "Removing platform-specific package-lock.json..."
+          rm -f package-lock.json
+          echo "Installing dependencies and generating new lockfile for Linux..."
+          npm install
 
       - name: Create temporary next.config.js for static export
         run: |

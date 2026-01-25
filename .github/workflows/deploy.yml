@@ -1,4 +1,4 @@
-name: Deploy Next.js to GitHub Pages (No Code Changes)
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
@@ -17,31 +17,24 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm' # Mantenemos el caché, pero lo limpiaremos explícitamente
+          # ELIMINADO: cache: 'npm'
+          # Razón: El caché está guardando binarios de Windows y causando el error EBADPLATFORM.
           
       - name: Install dependencies (Clean Slate Method)
-        # --- SECCIÓN COMPLETAMENTE REESCRITA ---
-        # Este método realiza una limpieza total para evitar cualquier residuo de plataforma.
         run: |
           echo "Node version:"
           node -v
           echo "NPM version:"
           npm -v
           
-          echo "Checking for problematic .npmrc file..."
-          # Listamos el archivo .npmrc si existe para depurar
-          ls -la .npmrc || echo "No .npmrc file found in project root."
-          
           echo "Cleaning npm cache thoroughly..."
-          # Limpiamos el caché de npm de forma forzada
           npm cache clean --force
           
           echo "Removing any existing package-lock.json and node_modules..."
-          # Nos aseguramos de eliminar cualquier rastro de instalaciones previas
           rm -rf package-lock.json node_modules
           
-          echo "Installing dependencies from scratch for Linux platform..."
-          # Ahora, la instalación debería ser 100% limpia y para la plataforma correcta
+          echo "Installing dependencies for Linux platform..."
+          # Al eliminar el cache y el lock, npm descargará los binarios correctos para Linux (linux-x64)
           npm install
 
       - name: Create temporary next.config.js for static export

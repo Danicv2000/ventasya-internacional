@@ -19,37 +19,26 @@ jobs:
           node-version: '20'
           
       - name: Install dependencies
-        run: npm ci
+        # --- LÍNEA MODIFICADA ---
+        # Se añade la bandera --ignore-platform para evitar el error de compatibilidad
+        run: npm ci --ignore-platform
 
       - name: Create temporary next.config.js for static export
-        # Este paso crea un archivo de configuración temporal SOLO para este workflow.
-        # No modifica tu código en el repositorio.
         run: |
           cat <<'EOF' > next.config.js
           /** @type {import('next').NextConfig} */
           const nextConfig = {
-            // 1. Genera una versión estática del sitio.
             output: 'export',
-            
-            // 2. Define la ruta base para que los assets (CSS, JS, imágenes) funcionen en GitHub Pages.
-            //    ¡IMPORTANTE! Reemplaza 'ventasya-internacional' con el nombre exacto de tu repositorio.
             basePath: '/ventasya-internacional/',
-            
-            // 3. Asegura que las URLs terminen en '/', lo cual es bueno para la consistencia.
             trailingSlash: true,
-            
-            // 4. Deshabilita la optimización de imágenes, ya que requiere un servidor.
             images: {
               unoptimized: true,
             },
           }
-
           module.exports = nextConfig
           EOF
 
       - name: Build Static Export
-        # El comando 'npm run build' ahora usará el next.config.js que creamos en el paso anterior.
-        # Esto generará la carpeta 'out' con el sitio estático.
         run: npm run build
         
       - name: List 'out' directory (for debugging)

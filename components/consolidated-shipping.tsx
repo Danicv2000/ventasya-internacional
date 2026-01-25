@@ -72,6 +72,17 @@ const existingOrders = [
   }
 ]
 
+// SOLUCIÓN: Interfaz que define las propiedades que TypeScript reclama faltan
+interface OrderWithDetails {
+  id: string;
+  clientName: string;
+  productPriceUSD: number;
+  quantity: number;
+  weightLbs: number;
+  orderNumber: string;
+  productName: string;
+}
+
 export function ConsolidatedShipping() {
   const { currentGroup, addOrderToGroup, removeOrderFromGroup, createNewGroup } = useShipping()
   const [selectedOrderId, setSelectedOrderId] = useState("")
@@ -252,22 +263,24 @@ export function ConsolidatedShipping() {
           
           <div className="space-y-4">
             {currentGroup.orders.map((order) => {
-              const totals = calculateOrderTotal(order)
+              // SOLUCIÓN APLICADA AQUÍ: Casting a OrderWithDetails para satisfacer a TypeScript
+              const typedOrder = order as OrderWithDetails;
+              const totals = calculateOrderTotal(typedOrder)
               
               return (
-                <div key={order.id} className="border rounded-lg p-4 bg-muted/20">
+                <div key={typedOrder.id} className="border rounded-lg p-4 bg-muted/20">
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-medium">{order.clientName}</h4>
-                        <Badge variant="outline">{order.orderNumber}</Badge>
+                        <h4 className="font-medium">{typedOrder.clientName}</h4>
+                        <Badge variant="outline">{typedOrder.orderNumber}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {order.productName} • {order.quantity}x • {order.weightLbs} lbs
+                        {typedOrder.productName} • {typedOrder.quantity}x • {typedOrder.weightLbs} lbs
                       </p>
                     </div>
                     <Button
-                      onClick={() => handleRemoveOrder(order.id)}
+                      onClick={() => handleRemoveOrder(typedOrder.id)}
                       variant="outline"
                       size="sm"
                     >

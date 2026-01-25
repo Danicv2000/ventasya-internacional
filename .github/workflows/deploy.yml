@@ -17,24 +17,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          # ELIMINADO: cache: 'npm'
-          # Razón: El caché está guardando binarios de Windows y causando el error EBADPLATFORM.
+          # IMPORTANTE: Mantener cache deshabilitado para evitar conflictos de plataforma
           
-      - name: Install dependencies (Clean Slate Method)
+      - name: Install dependencies (Safe & Automatic Method)
         run: |
           echo "Node version:"
           node -v
-          echo "NPM version:"
-          npm -v
           
-          echo "Cleaning npm cache thoroughly..."
-          npm cache clean --force
+          echo "Cleaning environment..."
+          # Limpiamos cualquier residuo que pueda causar conflicto
+          rm -rf node_modules package-lock.json
           
-          echo "Removing any existing package-lock.json and node_modules..."
-          rm -rf package-lock.json node_modules
-          
-          echo "Installing dependencies for Linux platform..."
-          # Al eliminar el cache y el lock, npm descargará los binarios correctos para Linux (linux-x64)
+          echo "Installing dependencies..."
+          # 'npm install' creará un package-lock.json nuevo si falta (arregla el error actual)
+          # y detectará automáticamente que estamos en Linux (arregla el error anterior de Windows)
           npm install
 
       - name: Create temporary next.config.js for static export
@@ -43,7 +39,7 @@ jobs:
           /** @type {import('next').NextConfig} */
           const nextConfig = {
             output: 'export',
-            # ¡IMPORTANTE! Reemplaza 'ventasya-internacional' con el nombre de tu repositorio
+            # ¡IMPORTANTE! Asegúrate de que este nombre coincida con tu repo
             basePath: '/ventasya-internacional/', 
             trailingSlash: true,
             images: {

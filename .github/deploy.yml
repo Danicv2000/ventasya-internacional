@@ -1,0 +1,73 @@
+name: Deploy Next.js to GitHub Pages (No Code Changes)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create temporary next.config.js for static export
+        # Este paso crea un archivo de configuración temporal SOLO para este workflow.
+        # No modifica tu código en el repositorio.
+        run: |
+          cat <<'EOF' > next.config.js
+          /** @type {import('next').NextConfig} */
+          const nextConfig = {
+            // 1. Genera una versión estática del sitio.
+            output: 'export',
+            
+            // 2. Define la ruta base para que los assets (CSS, JS, imágenes) funcionen en GitHub Pages.
+            //    ¡IMPORTANTE! Reemplaza 'ventasya-internacional' con el nombre exacto de tu repositorio.
+            basePath: '/ventasya-internacional/',
+            
+            // 3. Asegura que las URLs terminen en '/', lo cual es bueno para la consistencia.
+            trailingSlash: true,
+            
+            // 4. Deshabilita la optimización de imágenes, ya que requiere un servidor.
+            images: {
+              unoptimized: true,
+            },
+          }
+
+          module.exports = nextConfig
+          EOF
+
+      - name: Build Static Export
+        # El comando 'npm run build' ahora usará el next.config.js que creamos en el paso anterior.
+        # Esto generará la carpeta 'out' con el sitio estático.
+        run: npm run build
+        
+      - name: List 'out' directory (for debugging)
+        run: ls -la out/
+        
+      - name: Prepare deployment files
+        run: |
+          mkdir -p deploy-files
+          cp -r out/* deploy-files/
+          touch deploy-files/.nojekyll
+          cp deploy-files/index.html deploy-files/404.html
+          echo "Files ready for deployment:"
+          ls -la deploy-files/
+        
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: deploy-files
+          branch: gh-pages
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          clean: true

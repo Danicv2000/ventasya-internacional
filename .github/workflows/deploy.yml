@@ -39,8 +39,8 @@ jobs:
           /** @type {import('next').NextConfig} */
           const nextConfig = {
             output: 'export',
-            // ¡IMPORTANTE! Usamos '//' porque esto es código JavaScript, no Bash
-            basePath: '/ventasya-internacional/', 
+            // CORRECCIÓN: El basePath NO debe llevar barra al final
+            basePath: '/ventasya-internacional',
             trailingSlash: true,
             images: {
               unoptimized: true,

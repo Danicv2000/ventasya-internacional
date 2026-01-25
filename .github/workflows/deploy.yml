@@ -17,20 +17,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          # IMPORTANTE: Mantener cache deshabilitado para evitar conflictos de plataforma
-          
-      - name: Install dependencies (Safe & Automatic Method)
+
+      - name: Clean Install (Fixing corrupted package.json)
         run: |
           echo "Node version:"
           node -v
           
+          echo "Sanitizing package.json..."
+          # Borra referencias forzadas a Windows/Mac
+          sed -i -E '/"@next\/swc-(win32|darwin)/d' package.json
+          
           echo "Cleaning environment..."
-          # Limpiamos cualquier residuo que pueda causar conflicto
           rm -rf node_modules package-lock.json
           
           echo "Installing dependencies..."
-          # 'npm install' creará un package-lock.json nuevo si falta (arregla el error actual)
-          # y detectará automáticamente que estamos en Linux (arregla el error anterior de Windows)
           npm install
 
       - name: Create temporary next.config.js for static export
@@ -39,7 +39,7 @@ jobs:
           /** @type {import('next').NextConfig} */
           const nextConfig = {
             output: 'export',
-            # ¡IMPORTANTE! Asegúrate de que este nombre coincida con tu repo
+            // ¡IMPORTANTE! Usamos '//' porque esto es código JavaScript, no Bash
             basePath: '/ventasya-internacional/', 
             trailingSlash: true,
             images: {

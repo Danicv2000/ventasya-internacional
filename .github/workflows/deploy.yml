@@ -17,16 +17,31 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+          cache: 'npm' # Mantenemos el caché, pero lo limpiaremos explícitamente
           
-      - name: Install dependencies (Cross-Platform)
-        # --- SECCIÓN MODIFICADA ---
-        # Este método es más robusto para manejar diferencias de plataforma.
-        # 1. Eliminamos el package-lock.json generado en Windows.
-        # 2. Usamos 'npm install' para generar uno nuevo compatible con Linux.
+      - name: Install dependencies (Clean Slate Method)
+        # --- SECCIÓN COMPLETAMENTE REESCRITA ---
+        # Este método realiza una limpieza total para evitar cualquier residuo de plataforma.
         run: |
-          echo "Removing platform-specific package-lock.json..."
-          rm -f package-lock.json
-          echo "Installing dependencies and generating new lockfile for Linux..."
+          echo "Node version:"
+          node -v
+          echo "NPM version:"
+          npm -v
+          
+          echo "Checking for problematic .npmrc file..."
+          # Listamos el archivo .npmrc si existe para depurar
+          ls -la .npmrc || echo "No .npmrc file found in project root."
+          
+          echo "Cleaning npm cache thoroughly..."
+          # Limpiamos el caché de npm de forma forzada
+          npm cache clean --force
+          
+          echo "Removing any existing package-lock.json and node_modules..."
+          # Nos aseguramos de eliminar cualquier rastro de instalaciones previas
+          rm -rf package-lock.json node_modules
+          
+          echo "Installing dependencies from scratch for Linux platform..."
+          # Ahora, la instalación debería ser 100% limpia y para la plataforma correcta
           npm install
 
       - name: Create temporary next.config.js for static export
@@ -35,7 +50,8 @@ jobs:
           /** @type {import('next').NextConfig} */
           const nextConfig = {
             output: 'export',
-            basePath: '/ventasya-internacional/',
+            # ¡IMPORTANTE! Reemplaza 'ventasya-internacional' con el nombre de tu repositorio
+            basePath: '/ventasya-internacional/', 
             trailingSlash: true,
             images: {
               unoptimized: true,

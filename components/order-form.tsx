@@ -37,7 +37,7 @@ export function OrderForm() {
     console.log("[v0] Order request submitted:", formData)
 
     setTimeout(() => {
-      alert("¡Solicitud enviada! Te contactaremos por WhatsApp con el precio total en breve.")
+      alert("¡Solicitud enviada! Te contactaremos por WhatsApp con el PRIMER PAGO (producto + seguro) en breve.")
 
       // Reset form
       setFormData({
@@ -72,7 +72,9 @@ export function OrderForm() {
           <Alert className="border-primary/30 bg-primary/5">
             <Sparkles className="size-4" />
             <AlertDescription>
-              Solo necesitamos tu nombre, teléfono y el enlace del producto. Te enviaremos el precio por WhatsApp.
+              <strong>💡 Nuevo Sistema de Pagos:</strong> Ahora pagas en 2 etapas: 
+              <br />• <strong>1er Pago:</strong> Producto + seguro (al hacer el pedido)
+              <br />• <strong>2do Pago:</strong> Envío real según peso (cuando llegue el paquete)
             </AlertDescription>
           </Alert>
 
@@ -165,6 +167,17 @@ export function OrderForm() {
                 />
               </div>
 
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-800 mb-2">📦 Información Importante sobre el Peso</h4>
+                <p className="text-sm text-blue-700 mb-2">
+                  <strong>No necesitas saber el peso exacto ahora.</strong> Te cotizaremos con un peso estimado y el pago final se ajustará según el peso real cuando llegue el paquete.
+                </p>
+                <div className="text-xs text-blue-600 space-y-1">
+                  <p>• <strong>1er Pago:</strong> Precio del producto + seguro (3%) + fee de plataforma</p>
+                  <p>• <strong>2do Pago:</strong> Envío real ($10 base + $5.50 por libra real) + comisión</p>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="clientNotes">Detalles Adicionales (Talla, Color, etc.)</Label>
                 <Textarea
@@ -191,7 +204,11 @@ export function OrderForm() {
             <Alert>
               <AlertCircle className="size-4" />
               <AlertDescription className="text-sm">
-                Recibirás una respuesta por WhatsApp con el precio total en las próximas horas
+                <strong>📱 Próximos pasos:</strong>
+                <br />1. Te enviaremos el <strong>1er pago</strong> por WhatsApp (producto + seguro)
+                <br />2. Una vez confirmado, compramos tu producto
+                <br />3. Cuando llegue, te cobramos el <strong>2do pago</strong> (envío real según peso)
+                <br />4. ¡Recibes tu producto! 🎉
               </AlertDescription>
             </Alert>
           </form>

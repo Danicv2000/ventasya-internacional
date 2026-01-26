@@ -121,7 +121,7 @@ export function ConsolidatedShipping() {
   const calculateOrderTotal = (order: any) => {
     const productTotal = order.productPriceUSD * order.quantity
     const baseShippingShare = currentGroup?.baseShippingPerOrder || 0
-    const weightShipping = order.weightLbs * 4
+    const weightShipping = order.weightLbs * 5.5
     const shippingTotal = baseShippingShare + weightShipping
     
     // Comisión y margen sobre el producto

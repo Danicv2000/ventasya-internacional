@@ -55,8 +55,8 @@ export function CostCalculator() {
     // Gastos fijos de envío: 25 USD por pedido (sin importar cantidad)
     const baseShipping = 25
     
-    // Gastos variables: 4 USD por libra
-    const weightShipping = weight * 4
+    // Gastos variables: 5.5 USD por libra (incluye costo real + margen)
+    const weightShipping = weight * 5.5
     
     // Total de envío
     const totalShipping = baseShipping + weightShipping

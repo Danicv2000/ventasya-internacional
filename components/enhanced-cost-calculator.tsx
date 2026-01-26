@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Calculator, RotateCcw, Sparkles, TrendingUp, DollarSign } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { ProfitabilityAdvisor } from "@/components/profitability-advisor"
 
 interface CalculationResult {
   productPriceUSD: number
@@ -20,16 +21,23 @@ interface CalculationResult {
   platformFeeUSD: number
   totalCostUSD: number
   exchangeRate: number
-  totalCostCOP: number
+  totalCostCUP: number
   commissionPercentage: number
-  commissionCOP: number
+  commissionCUP: number
   profitMarginPercentage: number
-  profitMarginCOP: number
-  subtotalBeforeTaxCOP: number
+  profitMarginCUP: number
+  subtotalBeforeTaxCUP: number
   taxPercentage: number
-  taxCOP: number
-  finalPriceCOP: number
-  profitCOP: number
+  taxCUP: number
+  finalPriceCUP: number
+  profitCUP: number
+  firstPaymentUSD: number
+  firstPaymentCUP: number
+  secondPaymentUSD: number
+  secondPaymentCUP: number
+  insuranceCost: number
+  operationalCost: number
+  insurancePercentage: number
 }
 
 export function EnhancedCostCalculator() {
@@ -37,11 +45,13 @@ export function EnhancedCostCalculator() {
   const [quantity, setQuantity] = useState(1)
   const [weightLbs, setWeightLbs] = useState("")
   const [exchangeRate, setExchangeRate] = useState("420")
-  const [commissionPercentage, setCommissionPercentage] = useState("15")
-  const [profitMarginPercentage, setProfitMarginPercentage] = useState("5")
-  const [customPlatformFee, setCustomPlatformFee] = useState("0")
+  const [commissionPercentage, setCommissionPercentage] = useState("20")
+  const [profitMarginPercentage, setProfitMarginPercentage] = useState("15")
+  const [customPlatformFee, setCustomPlatformFee] = useState("2")
   const [includeTax, setIncludeTax] = useState(false)
   const [taxPercentage, setTaxPercentage] = useState("19")
+  const [insurancePercentage, setInsurancePercentage] = useState("3")
+  const [operationalCostUSD, setOperationalCostUSD] = useState("5")
 
   const [result, setResult] = useState<CalculationResult | null>(null)
   const [isCalculating, setIsCalculating] = useState(false)
@@ -59,38 +69,55 @@ export function EnhancedCostCalculator() {
     const weight = Number.parseFloat(weightLbs) || 0
     const subtotal = productPrice * qty
 
-    // Gastos fijos de envío: 25 USD por pedido (sin importar cantidad)
-    const baseShipping = 25
+    // Gastos fijos de envío: 10 USD por pedido (sin importar cantidad)
+    const baseShipping = 10
     
-    // Gastos variables: 4 USD por libra
-    const weightShipping = weight * 4
+    // Gastos variables: 5.5 USD por libra (incluye costo real + margen)
+    const weightShipping = weight * 5.5
+    
+    // Costos operacionales (manejo, empaque, gestión)
+    const operationalCost = Number.parseFloat(operationalCostUSD)
+    
+    // Seguro del producto (porcentaje del valor)
+    const insuranceRate = Number.parseFloat(insurancePercentage)
+    const insuranceCost = (subtotal * insuranceRate) / 100
     
     // Total de envío
-    const totalShipping = baseShipping + weightShipping
+    const totalShipping = baseShipping + weightShipping + operationalCost + insuranceCost
 
     const platformFee = Number.parseFloat(customPlatformFee)
 
     const totalUSD = subtotal + totalShipping + platformFee
     const rate = Number.parseFloat(exchangeRate)
-    const totalCOP = totalUSD * rate
+    const totalCUP = totalUSD * rate
 
     const commission = Number.parseFloat(commissionPercentage)
-    const commissionCOP = (subtotal * rate) * (commission / 100)
+    const commissionCUP = (subtotal * rate) * (commission / 100)
 
     const margin = Number.parseFloat(profitMarginPercentage)
-    const marginCOP = (subtotal * rate) * (margin / 100)
+    const marginCUP = (subtotal * rate) * (margin / 100)
 
-    const subtotalBeforeTax = totalCOP + commissionCOP + marginCOP
+    const subtotalBeforeTax = totalCUP + commissionCUP + marginCUP
 
     let tax = 0
-    let taxCOP = 0
+    let taxCUP = 0
     if (includeTax) {
       tax = Number.parseFloat(taxPercentage)
-      taxCOP = subtotalBeforeTax * (tax / 100)
+      taxCUP = subtotalBeforeTax * (tax / 100)
     }
 
-    const finalPrice = subtotalBeforeTax + taxCOP
-    const profit = commissionCOP + marginCOP
+    const finalPrice = subtotalBeforeTax + taxCUP
+    const profit = commissionCUP + marginCUP
+
+    // Primer pago: Producto + Seguro + Fee de plataforma + Margen inicial
+    const initialMargin = (subtotal * rate) * (margin / 100) * 0.5 // 50% del margen en el primer pago
+    const firstPaymentUSD = subtotal + insuranceCost + platformFee
+    const firstPaymentCUP = (firstPaymentUSD * rate) + initialMargin
+    
+    // Segundo pago: Envío real + Costos operacionales + Resto del margen + Comisión
+    const remainingMargin = (subtotal * rate) * (margin / 100) * 0.5 // 50% restante del margen
+    const secondPaymentUSD = totalShipping - insuranceCost // Ya incluido en primer pago
+    const secondPaymentCUP = (secondPaymentUSD * rate) + remainingMargin + commissionCUP
 
     setResult({
       productPriceUSD: productPrice,
@@ -103,16 +130,23 @@ export function EnhancedCostCalculator() {
       platformFeeUSD: platformFee,
       totalCostUSD: totalUSD,
       exchangeRate: rate,
-      totalCostCOP: totalCOP,
+      totalCostCUP: totalCUP,
       commissionPercentage: commission,
-      commissionCOP,
+      commissionCUP,
       profitMarginPercentage: margin,
-      profitMarginCOP: marginCOP,
-      subtotalBeforeTaxCOP: subtotalBeforeTax,
+      profitMarginCUP: marginCUP,
+      subtotalBeforeTaxCUP: subtotalBeforeTax,
       taxPercentage: tax,
-      taxCOP,
-      finalPriceCOP: finalPrice,
-      profitCOP: profit,
+      taxCUP,
+      finalPriceCUP: finalPrice,
+      profitCUP: profit,
+      firstPaymentUSD,
+      firstPaymentCUP,
+      secondPaymentUSD,
+      secondPaymentCUP,
+      insuranceCost,
+      operationalCost: operationalCost,
+      insurancePercentage: insuranceRate,
     })
 
     setIsCalculating(false)
@@ -124,11 +158,13 @@ export function EnhancedCostCalculator() {
     setQuantity(1)
     setWeightLbs("")
     setExchangeRate("420")
-    setCommissionPercentage("15")
-    setProfitMarginPercentage("5")
-    setCustomPlatformFee("0")
+    setCommissionPercentage("20")
+    setProfitMarginPercentage("15")
+    setCustomPlatformFee("2")
     setIncludeTax(false)
     setTaxPercentage("19")
+    setInsurancePercentage("3")
+    setOperationalCostUSD("5")
     setResult(null)
     setShowResult(false)
   }
@@ -203,7 +239,10 @@ export function EnhancedCostCalculator() {
             <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl border border-green-200">
               <p className="text-sm text-gray-600 flex items-center gap-2">
                 <span className="text-2xl">🚚</span>
-                <span><strong>Envío:</strong> $25 USD fijo por pedido + $4 USD por libra total</span>
+                <span><strong>Envío:</strong> $10 USD fijo + $5.50 USD/lb + Costos operacionales + Seguro</span>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                * Seguro: 3% del valor del producto | Operacional: $5 USD por pedido
               </p>
             </div>
           </div>
@@ -236,6 +275,54 @@ export function EnhancedCostCalculator() {
                   step="0.1"
                   value={commissionPercentage}
                   onChange={(e) => setCommissionPercentage(e.target.value)}
+                  className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profitMargin" className="font-semibold text-gray-700">Margen Ganancia (%)</Label>
+                <Input
+                  id="profitMargin"
+                  type="number"
+                  step="0.1"
+                  value={profitMarginPercentage}
+                  onChange={(e) => setProfitMarginPercentage(e.target.value)}
+                  className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="insurance" className="font-semibold text-gray-700">Seguro (%)</Label>
+                <Input
+                  id="insurance"
+                  type="number"
+                  step="0.1"
+                  value={insurancePercentage}
+                  onChange={(e) => setInsurancePercentage(e.target.value)}
+                  className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="platformFee" className="font-semibold text-gray-700">Fee Plataforma (USD)</Label>
+                <Input
+                  id="platformFee"
+                  type="number"
+                  step="0.1"
+                  value={customPlatformFee}
+                  onChange={(e) => setCustomPlatformFee(e.target.value)}
+                  className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="operational" className="font-semibold text-gray-700">Costo Operacional (USD)</Label>
+                <Input
+                  id="operational"
+                  type="number"
+                  step="0.1"
+                  value={operationalCostUSD}
+                  onChange={(e) => setOperationalCostUSD(e.target.value)}
                   className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
                 />
               </div>
@@ -311,10 +398,58 @@ export function EnhancedCostCalculator() {
                     <span className="font-medium">Envío por Peso ({result.weightLbs} lbs):</span>
                     <span className="font-bold text-blue-700">${result.weightShippingUSD.toFixed(2)}</span>
                   </div>
+                  <div className="flex justify-between items-center py-2 border-b border-blue-200">
+                    <span className="font-medium">Seguro del Producto:</span>
+                    <span className="font-bold text-blue-700">${result.insuranceCost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-blue-200">
+                    <span className="font-medium">Costos Operacionales:</span>
+                    <span className="font-bold text-blue-700">${result.operationalCost.toFixed(2)}</span>
+                  </div>
                   <div className="flex justify-between items-center py-3 bg-blue-100 rounded-lg px-4">
                     <span className="font-bold text-lg">Total USD:</span>
                     <span className="font-bold text-xl text-blue-800">${result.totalCostUSD.toFixed(2)}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Payment Breakdown */}
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200">
+                <h3 className="font-bold text-lg text-orange-800 mb-4 flex items-center gap-2">
+                  💳 Sistema de Pagos Optimizado
+                </h3>
+                <div className="space-y-4">
+                  <div className="bg-white/70 rounded-lg p-4 border border-orange-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-orange-700">🛒 Primer Pago (Al Comprar):</span>
+                      <span className="font-bold text-orange-800">${result.firstPaymentUSD.toFixed(2)} USD</span>
+                    </div>
+                    <p className="text-sm text-orange-600 mb-2">Equivalente: ${result.firstPaymentCUP.toLocaleString("es-CU")} CUP</p>
+                    <div className="text-xs text-gray-600 bg-orange-50 p-2 rounded">
+                      <p>✅ Incluye: Producto + Seguro + Fee plataforma + 50% margen</p>
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-lg p-4 border border-red-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-red-700">📦 Segundo Pago (Al Llegar):</span>
+                      <span className="font-bold text-red-800">${result.secondPaymentUSD.toFixed(2)} USD</span>
+                    </div>
+                    <p className="text-sm text-red-600 mb-2">Equivalente: ${result.secondPaymentCUP.toLocaleString("es-CU")} CUP</p>
+                    <div className="text-xs text-gray-600 bg-red-50 p-2 rounded">
+                      <p>✅ Incluye: Envío real + Operacional + Comisión + 50% margen restante</p>
+                      <p className="mt-1">* Calculado según peso real del producto recibido</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg border border-green-200">
+                  <p className="text-sm font-semibold text-green-800 mb-1">💡 Ventajas del Sistema:</p>
+                  <ul className="text-xs text-green-700 space-y-1">
+                    <li>• Cliente paga menos al inicio</li>
+                    <li>• Pago final basado en peso real</li>
+                    <li>• Mejor flujo de caja para el negocio</li>
+                    <li>• Transparencia total en costos</li>
+                  </ul>
                 </div>
               </div>
 
@@ -331,17 +466,17 @@ export function EnhancedCostCalculator() {
                 <div className="mb-4">
                   <p className="text-lg font-semibold text-green-700 mb-2">💰 Precio Final</p>
                   <div className="text-4xl font-bold text-green-800 mb-2 animate-pulse">
-                    ${result.finalPriceCOP.toLocaleString("es-CU")}
+                    ${result.finalPriceCUP.toLocaleString("es-CU")}
                   </div>
                   <Badge className="bg-green-600 text-white px-4 py-1 text-sm">
-                    Pesos Cubanos
+                    Pesos Cubanos (CUP)
                   </Badge>
                 </div>
                 
                 <div className="bg-white/70 rounded-lg p-4 mt-4">
                   <p className="text-sm text-green-700 mb-1">Equivalente en USD:</p>
                   <p className="text-2xl font-bold text-green-800">
-                    ${(result.finalPriceCOP / result.exchangeRate).toFixed(2)} USD
+                    ${(result.finalPriceCUP / result.exchangeRate).toFixed(2)} USD
                   </p>
                 </div>
               </div>
@@ -355,20 +490,31 @@ export function EnhancedCostCalculator() {
                       Ganancia Total
                     </p>
                     <p className="text-xs text-yellow-700 mt-1">
-                      {((result.profitCOP / result.finalPriceCOP) * 100).toFixed(1)}% del precio final
+                      {((result.profitCUP / result.finalPriceCUP) * 100).toFixed(1)}% del precio final
                     </p>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-yellow-800">
-                      ${result.profitCOP.toLocaleString("es-CU")}
+                      ${result.profitCUP.toLocaleString("es-CU")}
                     </div>
-                    <p className="text-sm text-yellow-700">Pesos</p>
+                    <p className="text-sm text-yellow-700">CUP</p>
                   </div>
                 </div>
               </div>
             </div>
           )}
         </Card>
+        
+        {/* Asesor de Rentabilidad */}
+        {result && showResult && (
+          <ProfitabilityAdvisor
+            productPriceUSD={result.productPriceUSD}
+            totalProfitCUP={result.profitCUP}
+            profitMarginPercentage={result.profitMarginPercentage}
+            exchangeRate={result.exchangeRate}
+            totalCostUSD={result.totalCostUSD}
+          />
+        )}
       </div>
     </div>
   )

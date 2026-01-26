@@ -46,31 +46,50 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
   const calculatePrice = () => {
     const productPrice = Number.parseFloat(formData.productPriceUSD)
     const quantity = formData.productQuantity
-    const weight = Number.parseFloat(formData.weightLbs) || 0
+    const weight = Number.parseFloat(formData.weightLbs) || 2.0 // Peso por defecto si no se especifica
     const subtotal = productPrice * quantity
 
-    // Gastos fijos de envío: 25 USD por pedido completo
-    const baseShipping = 25
-
-    // Gastos variables: 4 USD por libra
-    const weightShipping = weight * 4
-
+    // Gastos fijos de envío: 10 USD por pedido
+    const baseShipping = 10
+    
+    // Gastos variables: 5.5 USD por libra (incluye costo real + margen)
+    const weightShipping = weight * 5.5
+    
+    // Costos operacionales
+    const operationalCost = 5
+    
+    // Seguro del producto (3% del valor)
+    const insuranceRate = 3
+    const insuranceCost = (subtotal * insuranceRate) / 100
+    
+    // Fee de plataforma
+    const platformFee = 2
+    
     // Total de envío
-    const totalShipping = baseShipping + weightShipping
+    const totalShipping = baseShipping + weightShipping + operationalCost + insuranceCost
 
-    const totalCostUSD = subtotal + totalShipping
+    const totalCostUSD = subtotal + totalShipping + platformFee
     const rate = Number.parseFloat(exchangeRate) || 420
-    const totalCostCOP = totalCostUSD * rate
+    const totalCostCUP = totalCostUSD * rate
 
-    // Comisión: 15% sobre el valor del producto
-    const commissionPercentage = 15
-    const commissionCOP = (subtotal * rate) * (commissionPercentage / 100)
+    // Comisión: 20% sobre el valor del producto
+    const commissionPercentage = 20
+    const commissionCUP = (subtotal * rate) * (commissionPercentage / 100)
 
-    // Margen de seguridad: 5% sobre el valor del producto
-    const profitMarginPercentage = 5
-    const profitMarginCOP = (subtotal * rate) * (profitMarginPercentage / 100)
+    // Margen de ganancia: 15% sobre el valor del producto
+    const profitMarginPercentage = 15
+    const profitMarginCUP = (subtotal * rate) * (profitMarginPercentage / 100)
 
-    const finalPriceCOP = totalCostCOP + commissionCOP + profitMarginCOP
+    const finalPriceCUP = totalCostCUP + commissionCUP + profitMarginCUP
+
+    // Cálculo de pagos en 2 etapas
+    const initialMargin = profitMarginCUP * 0.5 // 50% del margen en el primer pago
+    const firstPaymentUSD = subtotal + insuranceCost + platformFee
+    const firstPaymentCUP = (firstPaymentUSD * rate) + initialMargin
+    
+    const remainingMargin = profitMarginCUP * 0.5 // 50% restante del margen
+    const secondPaymentUSD = totalShipping - insuranceCost // Ya incluido en primer pago
+    const secondPaymentCUP = (secondPaymentUSD * rate) + remainingMargin + commissionCUP
 
     setPriceBreakdown({
       productPriceUSD: subtotal,
@@ -78,14 +97,21 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
       baseShippingUSD: baseShipping,
       weightShippingUSD: weightShipping,
       totalShippingUSD: totalShipping,
+      operationalCost,
+      insuranceCost,
+      platformFee,
       totalCostUSD,
       exchangeRate: rate,
-      totalCostCOP,
+      totalCostCUP,
       commissionPercentage,
-      commissionCOP,
+      commissionCUP,
       profitMarginPercentage,
-      profitMarginCOP,
-      finalPriceCOP,
+      profitMarginCUP,
+      finalPriceCUP,
+      firstPaymentUSD,
+      firstPaymentCUP,
+      secondPaymentUSD,
+      secondPaymentCUP,
     })
   }
 
@@ -93,9 +119,15 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
     const orderData = {
       ...formData,
       priceBreakdown,
+      firstPaymentCUP: priceBreakdown?.firstPaymentCUP || 0,
+      secondPaymentCUP: priceBreakdown?.secondPaymentCUP || 0,
+      finalPriceCUP: priceBreakdown?.finalPriceCUP || 0,
+      estimatedWeightLbs: Number.parseFloat(formData.weightLbs) || 2.0,
       orderNumber: `ORD-${Date.now()}`,
       status: "pending",
       paymentStatus: "pending",
+      firstPaymentStatus: "pending",
+      secondPaymentStatus: "pending",
       createdAt: new Date(),
     }
     onSave(orderData)
@@ -121,8 +153,7 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
     formData.clientName &&
     formData.clientPhone &&
     formData.productName &&
-    formData.productPriceUSD &&
-    formData.weightLbs
+    formData.productPriceUSD
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -228,46 +259,65 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="productPriceUSD">Precio USD *</Label>
-                  <Input
-                    id="productPriceUSD"
-                    type="number"
-                    step="0.01"
-                    value={formData.productPriceUSD}
-                    onChange={(e) => handleChange("productPriceUSD", e.target.value)}
-                    placeholder="25.99"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="productQuantity">Cantidad *</Label>
-                  <Input
-                    id="productQuantity"
-                    type="number"
-                    min="1"
-                    value={formData.productQuantity}
-                    onChange={(e) => handleChange("productQuantity", Number.parseInt(e.target.value))}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="productPriceUSD">Precio USD *</Label>
+                <Input
+                  id="productPriceUSD"
+                  type="number"
+                  step="0.01"
+                  value={formData.productPriceUSD}
+                  onChange={(e) => handleChange("productPriceUSD", e.target.value)}
+                  placeholder="25.99"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="weightLbs">Peso del Paquete (Libras) *</Label>
+                <Label htmlFor="productQuantity">Cantidad *</Label>
                 <Input
-                  id="weightLbs"
+                  id="productQuantity"
                   type="number"
-                  step="0.1"
-                  min="0"
-                  value={formData.weightLbs}
-                  onChange={(e) => handleChange("weightLbs", e.target.value)}
-                  placeholder="2.5"
+                  min="1"
+                  value={formData.productQuantity}
+                  onChange={(e) => handleChange("productQuantity", Number.parseInt(e.target.value))}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Envío: $25 USD fijo por pedido + $4 USD por libra total
-                </p>
               </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-800 mb-2">📦 Nuevo Sistema de Pagos en 2 Etapas</h4>
+              <div className="text-sm text-blue-700 space-y-2">
+                <p><strong>🛒 1er Pago (Al crear pedido):</strong></p>
+                <ul className="text-xs ml-4 space-y-1">
+                  <li>• Precio del producto</li>
+                  <li>• Seguro (3% del valor)</li>
+                  <li>• Fee de plataforma ($2 USD)</li>
+                  <li>• 50% del margen de ganancia</li>
+                </ul>
+                
+                <p><strong>📦 2do Pago (Cuando llegue el paquete):</strong></p>
+                <ul className="text-xs ml-4 space-y-1">
+                  <li>• Envío real ($10 + $5.50/lb real)</li>
+                  <li>• Costos operacionales ($5 USD)</li>
+                  <li>• Comisión (20%)</li>
+                  <li>• 50% restante del margen</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="weightLbs">Peso Estimado (Libras) - Opcional</Label>
+              <Input
+                id="weightLbs"
+                type="number"
+                step="0.1"
+                min="0"
+                value={formData.weightLbs}
+                onChange={(e) => handleChange("weightLbs", e.target.value)}
+                placeholder="2.5"
+              />
+              <p className="text-xs text-muted-foreground">
+                ⚠️ Solo para estimación inicial. El 2do pago se calculará con el peso real.
+              </p>
 
               <div className="space-y-2">
                 <Label htmlFor="storeName">Tienda (Opcional)</Label>
@@ -300,75 +350,92 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
           {/* Price Calculation Section */}
           <div className="space-y-4">
             <Card className="p-6 sticky top-4">
-              <h3 className="font-semibold text-lg mb-4">Cálculo de Precio</h3>
+              <h3 className="font-semibold text-lg mb-4">💰 Sistema de Pagos en 2 Etapas</h3>
 
               <Button
                 onClick={calculatePrice}
-                disabled={!formData.productPriceUSD || !formData.weightLbs || !exchangeRate}
+                disabled={!formData.productPriceUSD || !exchangeRate}
                 className="w-full mb-4 bg-gradient-to-r from-primary to-accent"
               >
                 <Calculator className="size-4 mr-2" />
-                Calcular Precio
+                Calcular Pagos
               </Button>
 
               {priceBreakdown && (
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Producto:</span>
-                    <span>${priceBreakdown.productPriceUSD.toFixed(2)} USD</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Envío Base:</span>
-                    <span>${priceBreakdown.baseShippingUSD.toFixed(2)} USD</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Envío por Peso ({priceBreakdown.weightLbs} lbs):</span>
-                    <span>${priceBreakdown.weightShippingUSD.toFixed(2)} USD</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Total Envío:</span>
-                    <span>${priceBreakdown.totalShippingUSD.toFixed(2)} USD</span>
-                  </div>
-
-                  <div className="flex justify-between pt-2 border-t">
-                    <span className="font-medium">Total USD:</span>
-                    <span className="font-semibold">${priceBreakdown.totalCostUSD.toFixed(2)}</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm bg-muted px-3 py-2 rounded">
-                    <span>Tasa de cambio:</span>
-                    <span>{priceBreakdown.exchangeRate.toFixed(2)} Pesos Cubanos/USD</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="font-medium">Costo Pesos:</span>
-                    <span>{priceBreakdown.totalCostCOP.toLocaleString("es-CU")} Pesos Cubanos</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Comisión (15% sobre producto):</span>
-                    <span>{priceBreakdown.commissionCOP.toLocaleString("es-CU")} Pesos Cubanos</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Margen (5% sobre producto):</span>
-                    <span>{priceBreakdown.profitMarginCOP.toLocaleString("es-CU")} Pesos Cubanos</span>
-                  </div>
-
-                  <div className="flex justify-between pt-3 border-t">
-                    <span className="text-lg font-bold">Precio Final:</span>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {priceBreakdown.finalPriceCOP.toLocaleString("es-CU")} Pesos Cubanos
+                <div className="space-y-4">
+                  {/* Primer Pago */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-semibold text-blue-800 mb-2">🛒 Primer Pago (Al crear pedido)</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Producto:</span>
+                        <span>${priceBreakdown.productPriceUSD.toFixed(2)} USD</span>
                       </div>
-                      <div className="text-sm text-green-600 font-medium">
-                        ${(priceBreakdown.finalPriceCOP / priceBreakdown.exchangeRate).toFixed(2)} USD
+                      <div className="flex justify-between">
+                        <span>Seguro (3%):</span>
+                        <span>${priceBreakdown.insuranceCost.toFixed(2)} USD</span>
                       </div>
-                      <Badge className="mt-1">Calculado</Badge>
+                      <div className="flex justify-between">
+                        <span>Fee Plataforma:</span>
+                        <span>${priceBreakdown.platformFee.toFixed(2)} USD</span>
+                      </div>
+                      <div className="flex justify-between font-semibold text-blue-800 pt-2 border-t border-blue-300">
+                        <span>Total 1er Pago:</span>
+                        <span>${priceBreakdown.firstPaymentCUP.toLocaleString("es-CU")} CUP</span>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Segundo Pago */}
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <h4 className="font-semibold text-green-800 mb-2">📦 Segundo Pago (Al llegar paquete)</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Envío Base:</span>
+                        <span>${priceBreakdown.baseShippingUSD.toFixed(2)} USD</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Por Peso ({priceBreakdown.weightLbs} lbs):</span>
+                        <span>${priceBreakdown.weightShippingUSD.toFixed(2)} USD</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Operacional:</span>
+                        <span>${priceBreakdown.operationalCost.toFixed(2)} USD</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Comisión (20%):</span>
+                        <span>${priceBreakdown.commissionCUP.toLocaleString("es-CU")} CUP</span>
+                      </div>
+                      <div className="flex justify-between font-semibold text-green-800 pt-2 border-t border-green-300">
+                        <span>Total 2do Pago:</span>
+                        <span>${priceBreakdown.secondPaymentCUP.toLocaleString("es-CU")} CUP</span>
+                      </div>
+                      <p className="text-xs text-green-600 mt-2">
+                        * Se recalculará con el peso real del paquete
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Total Final */}
+                  <div className="bg-gray-100 rounded-lg p-4 border-2 border-gray-300">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold">💰 Total Final:</span>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">
+                          ${(priceBreakdown.firstPaymentCUP + priceBreakdown.secondPaymentCUP).toLocaleString("es-CU")} CUP
+                        </div>
+                        <div className="text-sm text-green-600 font-medium">
+                          ${((priceBreakdown.firstPaymentCUP + priceBreakdown.secondPaymentCUP) / priceBreakdown.exchangeRate).toFixed(2)} USD
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground bg-yellow-50 p-3 rounded border border-yellow-200">
+                    <p><strong>📋 Proceso:</strong></p>
+                    <p>1. Cliente paga el 1er monto al confirmar</p>
+                    <p>2. Compramos y enviamos el producto</p>
+                    <p>3. Al llegar, pesamos y cobramos el 2do monto real</p>
                   </div>
                 </div>
               )}

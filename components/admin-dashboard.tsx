@@ -22,9 +22,15 @@ const mockOrders = [
     clientEmail: "maria@example.com",
     productName: "Vestido de verano floral",
     storeName: "Shein",
-    finalPriceCOP: 134375,
+    finalPriceCUP: 134375,
+    firstPaymentCUP: 84000,
+    secondPaymentCUP: 50375,
     status: "in_transit",
-    paymentStatus: "partial",
+    paymentStatus: "first_paid",
+    firstPaymentStatus: "paid",
+    secondPaymentStatus: "pending",
+    estimatedWeightLbs: 1.5,
+    actualWeightLbs: 1.8,
     createdAt: new Date("2024-01-15"),
   },
   {
@@ -34,9 +40,14 @@ const mockOrders = [
     clientEmail: "carlos@example.com",
     productName: "Audífonos Bluetooth",
     storeName: "Temu",
-    finalPriceCOP: 188125,
+    finalPriceCUP: 188125,
+    firstPaymentCUP: 126000,
+    secondPaymentCUP: 62125,
     status: "confirmed",
     paymentStatus: "pending",
+    firstPaymentStatus: "pending",
+    secondPaymentStatus: "pending",
+    estimatedWeightLbs: 0.8,
     createdAt: new Date("2024-01-16"),
   },
   {
@@ -46,9 +57,15 @@ const mockOrders = [
     clientEmail: "ana@example.com",
     productName: "Reloj inteligente",
     storeName: "Amazon",
-    finalPriceCOP: 425000,
+    finalPriceCUP: 425000,
+    firstPaymentCUP: 315000,
+    secondPaymentCUP: 110000,
     status: "delivered",
     paymentStatus: "paid",
+    firstPaymentStatus: "paid",
+    secondPaymentStatus: "paid",
+    estimatedWeightLbs: 2.0,
+    actualWeightLbs: 2.2,
     createdAt: new Date("2024-01-10"),
   },
   {
@@ -58,9 +75,14 @@ const mockOrders = [
     clientEmail: "luis@example.com",
     productName: "Zapatillas deportivas",
     storeName: "Temu",
-    finalPriceCOP: 215000,
+    finalPriceCUP: 215000,
+    firstPaymentCUP: 147000,
+    secondPaymentCUP: 68000,
     status: "pending",
     paymentStatus: "pending",
+    firstPaymentStatus: "pending",
+    secondPaymentStatus: "pending",
+    estimatedWeightLbs: 2.5,
     createdAt: new Date("2024-01-17"),
   },
 ]
@@ -72,7 +94,7 @@ export function AdminDashboard() {
 
   // Calculate stats
   const totalOrders = mockOrders.length
-  const totalRevenue = mockOrders.reduce((sum, order) => sum + order.finalPriceCOP, 0)
+  const totalRevenue = mockOrders.reduce((sum, order) => sum + order.finalPriceCUP, 0)
   const pendingOrders = mockOrders.filter((o) => o.status === "pending" || o.status === "confirmed").length
   const deliveredOrders = mockOrders.filter((o) => o.status === "delivered").length
 

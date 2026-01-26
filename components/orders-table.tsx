@@ -11,10 +11,16 @@ interface Order {
   clientEmail: string
   productName: string
   storeName: string
-  finalPriceCOP: number
+  finalPriceCUP: number
+  firstPaymentCUP: number
+  secondPaymentCUP: number
   status: string
   paymentStatus: string
+  firstPaymentStatus: string
+  secondPaymentStatus: string
   createdAt: Date
+  estimatedWeightLbs?: number
+  actualWeightLbs?: number
 }
 
 interface OrdersTableProps {
@@ -33,8 +39,9 @@ const statusLabels: Record<string, { label: string; variant: "default" | "second
 
 const paymentLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "Pendiente", variant: "secondary" },
+  first_paid: { label: "1er Pago ✓", variant: "outline" },
   partial: { label: "Parcial", variant: "outline" },
-  paid: { label: "Pagado", variant: "default" },
+  paid: { label: "Completo ✓", variant: "default" },
 }
 
 export function OrdersTable({ orders, onViewOrder }: OrdersTableProps) {
@@ -55,7 +62,8 @@ export function OrdersTable({ orders, onViewOrder }: OrdersTableProps) {
             <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Cliente</th>
             <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Producto</th>
             <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Tienda</th>
-            <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Precio</th>
+            <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">1er Pago</th>
+            <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">2do Pago</th>
             <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Estado</th>
             <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Pago</th>
             <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Acciones</th>
@@ -82,7 +90,20 @@ export function OrdersTable({ orders, onViewOrder }: OrdersTableProps) {
               <td className="py-4 px-4">
                 <Badge variant="outline">{order.storeName}</Badge>
               </td>
-              <td className="py-4 px-4 text-right font-medium">${order.finalPriceCOP.toLocaleString("es-CO")}</td>
+              <td className="py-4 px-4 text-right">
+                <div className="text-sm">
+                  <p className="font-medium">${order.firstPaymentCUP?.toLocaleString("es-CU") || "0"}</p>
+                  <p className="text-xs text-muted-foreground">Producto + Seguro</p>
+                </div>
+              </td>
+              <td className="py-4 px-4 text-right">
+                <div className="text-sm">
+                  <p className="font-medium">${order.secondPaymentCUP?.toLocaleString("es-CU") || "Pendiente"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {order.actualWeightLbs ? `${order.actualWeightLbs} lbs` : "Peso estimado"}
+                  </p>
+                </div>
+              </td>
               <td className="py-4 px-4">
                 <Badge variant={statusLabels[order.status]?.variant || "secondary"}>
                   {statusLabels[order.status]?.label || order.status}

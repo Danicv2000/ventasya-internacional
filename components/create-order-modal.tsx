@@ -33,6 +33,7 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
   })
 
   const [exchangeRate, setExchangeRate] = useState("420")
+  const [ordersInPackage, setOrdersInPackage] = useState("4") // Número estimado de pedidos por paquete
 
   const [priceBreakdown, setPriceBreakdown] = useState<any>(null)
 
@@ -43,14 +44,20 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
     }
   }
 
+  const handleOrdersInPackageChange = (value: string) => {
+    setOrdersInPackage(value)
+    setPriceBreakdown(null)
+  }
+
   const calculatePrice = () => {
     const productPrice = Number.parseFloat(formData.productPriceUSD)
     const quantity = formData.productQuantity
     const weight = Number.parseFloat(formData.weightLbs) || 2.0 // Peso por defecto si no se especifica
     const subtotal = productPrice * quantity
 
-    // Gastos fijos de envío: 10 USD por pedido
-    const baseShipping = 10
+    // Gastos fijos de envío consolidado: $10 USD dividido entre pedidos
+    const ordersCount = Number.parseInt(ordersInPackage) || 4
+    const baseShipping = 10 / ordersCount
     
     // Gastos variables: 5.5 USD por libra (incluye costo real + margen)
     const weightShipping = weight * 5.5
@@ -166,28 +173,54 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
           {/* Form Section */}
           <div className="space-y-6">
             <Card className="p-4 bg-gradient-to-r from-primary/5 to-accent/5 border-2 border-primary/20">
-              <div className="space-y-2">
-                <Label htmlFor="exchangeRate" className="text-base font-semibold">
-                  Tasa de Cambio (USD a Pesos Cubanos) *
-                </Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">1 USD =</span>
-                  <Input
-                    id="exchangeRate"
-                    type="number"
-                    step="0.01"
-                    value={exchangeRate}
-                    onChange={(e) => {
-                      setExchangeRate(e.target.value)
-                      setPriceBreakdown(null)
-                    }}
-                    placeholder="420.00"
-                    className="flex-1 font-semibold text-lg"
-                  />
-                  <span className="text-sm font-medium">Pesos Cubanos</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="exchangeRate" className="text-base font-semibold">
+                    Tasa de Cambio (USD a CUP) *
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">1 USD =</span>
+                    <Input
+                      id="exchangeRate"
+                      type="number"
+                      step="0.01"
+                      value={exchangeRate}
+                      onChange={(e) => {
+                        setExchangeRate(e.target.value)
+                        setPriceBreakdown(null)
+                      }}
+                      placeholder="420.00"
+                      className="flex-1 font-semibold text-lg"
+                    />
+                    <span className="text-sm font-medium">CUP</span>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Actualiza la tasa de cambio actual del dólar a peso cubano
+                
+                <div className="space-y-2">
+                  <Label htmlFor="ordersInPackage" className="text-base font-semibold">
+                    Pedidos por Paquete *
+                  </Label>
+                  <Input
+                    id="ordersInPackage"
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={ordersInPackage}
+                    onChange={(e) => handleOrdersInPackageChange(e.target.value)}
+                    className="font-semibold text-lg"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Número estimado de pedidos que van juntos
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-sm text-green-700 font-medium">
+                  📦 Envío Consolidado: $10 USD ÷ {ordersInPackage} pedidos = ${(10 / Number.parseInt(ordersInPackage || "4")).toFixed(2)} USD por pedido
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Esto hace que productos baratos sean más accesibles para tus clientes
                 </p>
               </div>
             </Card>
@@ -296,7 +329,7 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
                 
                 <p><strong>📦 2do Pago (Cuando llegue el paquete):</strong></p>
                 <ul className="text-xs ml-4 space-y-1">
-                  <li>• Envío real ($10 + $5.50/lb real)</li>
+                  <li>• Envío consolidado (${(10 / Number.parseInt(ordersInPackage || "4")).toFixed(2)} + $5.50/lb real)</li>
                   <li>• Costos operacionales ($5 USD)</li>
                   <li>• Comisión (20%)</li>
                   <li>• 50% restante del margen</li>
@@ -391,7 +424,7 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
                     <h4 className="font-semibold text-green-800 mb-2">📦 Segundo Pago (Al llegar paquete)</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>Envío Base:</span>
+                        <span>Envío Base Consolidado:</span>
                         <span>${priceBreakdown.baseShippingUSD.toFixed(2)} USD</span>
                       </div>
                       <div className="flex justify-between">

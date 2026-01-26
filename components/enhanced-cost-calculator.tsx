@@ -534,6 +534,56 @@ export function EnhancedCostCalculator() {
             totalCostUSD={result.totalCostUSD}
           />
         )}
+
+        {/* Ejemplo de Envío Consolidado */}
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200">
+          <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center gap-2">
+            📦 Ejemplo: Envío Consolidado vs Individual
+          </h3>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-red-800 mb-3">❌ Envío Individual (Malo)</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Vestido $5 USD (1 lb):</span>
+                  <span className="font-bold">$20.50 USD</span>
+                </div>
+                <div className="text-xs text-red-600 ml-2">
+                  • Producto: $5.00<br/>
+                  • Envío: $10.00 + $5.50 = $15.50
+                </div>
+                <div className="pt-2 border-t border-red-300">
+                  <span className="text-red-700 font-medium">¡4x el precio del producto!</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <h4 className="font-semibold text-green-800 mb-3">✅ Envío Consolidado (Bueno)</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Vestido $5 USD (1 lb):</span>
+                  <span className="font-bold">$13.00 USD</span>
+                </div>
+                <div className="text-xs text-green-600 ml-2">
+                  • Producto: $5.00<br/>
+                  • Envío: $2.50 + $5.50 = $8.00
+                </div>
+                <div className="pt-2 border-t border-green-300">
+                  <span className="text-green-700 font-medium">Solo 2.6x el precio del producto</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-700">
+              <strong>💡 Ahorro:</strong> El cliente ahorra $7.50 USD por producto con envío consolidado.
+              Esto hace que productos baratos sean accesibles y competitivos.
+            </p>
+          </div>
+        </Card>
       </div>
     </div>
   )

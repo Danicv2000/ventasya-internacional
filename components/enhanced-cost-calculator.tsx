@@ -52,6 +52,7 @@ export function EnhancedCostCalculator() {
   const [taxPercentage, setTaxPercentage] = useState("19")
   const [insurancePercentage, setInsurancePercentage] = useState("3")
   const [operationalCostUSD, setOperationalCostUSD] = useState("5")
+  const [ordersInPackage, setOrdersInPackage] = useState("4") // Número estimado de pedidos por paquete
 
   const [result, setResult] = useState<CalculationResult | null>(null)
   const [isCalculating, setIsCalculating] = useState(false)
@@ -69,8 +70,9 @@ export function EnhancedCostCalculator() {
     const weight = Number.parseFloat(weightLbs) || 0
     const subtotal = productPrice * qty
 
-    // Gastos fijos de envío: 10 USD por pedido (sin importar cantidad)
-    const baseShipping = 10
+    // Gastos fijos de envío consolidado: $10 USD dividido entre pedidos del paquete
+    const ordersCount = Number.parseInt(ordersInPackage) || 4
+    const baseShipping = 10 / ordersCount
     
     // Gastos variables: 5.5 USD por libra (incluye costo real + margen)
     const weightShipping = weight * 5.5
@@ -238,11 +240,14 @@ export function EnhancedCostCalculator() {
 
             <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl border border-green-200">
               <p className="text-sm text-gray-600 flex items-center gap-2">
-                <span className="text-2xl">🚚</span>
-                <span><strong>Envío:</strong> $10 USD fijo + $5.50 USD/lb + Costos operacionales + Seguro</span>
+                <span className="text-2xl">📦</span>
+                <span><strong>Envío Consolidado:</strong> $10 USD ÷ {ordersInPackage} pedidos = ${(10 / Number.parseInt(ordersInPackage)).toFixed(2)} fijos + $5.50 USD/lb</span>
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 * Seguro: 3% del valor del producto | Operacional: $5 USD por pedido
+              </p>
+              <p className="text-xs text-green-600 mt-1 font-medium">
+                💡 Envío consolidado hace productos baratos más accesibles
               </p>
             </div>
           </div>
@@ -326,6 +331,20 @@ export function EnhancedCostCalculator() {
                   className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ordersInPackage" className="font-semibold text-gray-700">Pedidos por Paquete</Label>
+                <Input
+                  id="ordersInPackage"
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={ordersInPackage}
+                  onChange={(e) => setOrdersInPackage(e.target.value)}
+                  className="border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 rounded-lg"
+                />
+                <p className="text-xs text-gray-500">Número estimado de pedidos que van juntos</p>
+              </div>
             </div>
           </div>
 
@@ -391,7 +410,7 @@ export function EnhancedCostCalculator() {
                     <span className="font-bold text-blue-700">${result.subtotalUSD.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                    <span className="font-medium">Envío Base:</span>
+                    <span className="font-medium">Envío Base Consolidado ({ordersCount} pedidos):</span>
                     <span className="font-bold text-blue-700">${result.baseShippingUSD.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-blue-200">

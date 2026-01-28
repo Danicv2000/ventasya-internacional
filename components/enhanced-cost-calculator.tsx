@@ -410,7 +410,7 @@ export function EnhancedCostCalculator() {
                     <span className="font-bold text-blue-700">${result.subtotalUSD.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                    <span className="font-medium">Envío Base Consolidado ({ordersCount} pedidos):</span>
+                    <span className="font-medium">Envío Base Consolidado ({ordersInPackage} pedidos):</span>
                     <span className="font-bold text-blue-700">${result.baseShippingUSD.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-blue-200">

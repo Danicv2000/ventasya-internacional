@@ -19,8 +19,8 @@ interface Order {
   firstPaymentStatus: string
   secondPaymentStatus: string
   createdAt: Date
-  estimatedWeightLbs?: number
-  actualWeightLbs?: number
+  estimatedWeightLbs: number
+  actualWeightLbs: number
 }
 
 interface OrdersTableProps {

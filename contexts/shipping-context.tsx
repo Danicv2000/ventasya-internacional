@@ -8,6 +8,8 @@ interface Order {
   quantity: number
   weightLbs: number
   clientName: string
+  orderNumber: string
+  productName: string
 }
 
 interface ShippingGroup {

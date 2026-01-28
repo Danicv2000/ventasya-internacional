@@ -14,7 +14,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return (
       <AdminLogin 
         onLogin={login}
-        error={error}
+        error={error || undefined}
         isLoading={isLoading}
       />
     )

@@ -48,6 +48,7 @@ const mockOrders = [
     firstPaymentStatus: "pending",
     secondPaymentStatus: "pending",
     estimatedWeightLbs: 0.8,
+    actualWeightLbs: 0.8,
     createdAt: new Date("2024-01-16"),
   },
   {
@@ -83,6 +84,7 @@ const mockOrders = [
     firstPaymentStatus: "pending",
     secondPaymentStatus: "pending",
     estimatedWeightLbs: 2.5,
+    actualWeightLbs: 2.5,
     createdAt: new Date("2024-01-17"),
   },
 ]

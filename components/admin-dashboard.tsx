@@ -103,6 +103,11 @@ export function AdminDashboard() {
     alert("Pedido creado exitosamente")
   }
 
+  // SOLUCIÓN: Función puente para manejar la diferencia de tipos entre OrdersTable y el estado local
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -234,25 +239,25 @@ export function AdminDashboard() {
                 </div>
 
                 <TabsContent value="all" className="space-y-4">
-                  <OrdersTable orders={mockOrders} onViewOrder={setSelectedOrder} />
+                  <OrdersTable orders={mockOrders} onViewOrder={handleViewOrder} />
                 </TabsContent>
 
                 <TabsContent value="pending" className="space-y-4">
                   <OrdersTable
                     orders={mockOrders.filter((o) => o.status === "pending" || o.status === "confirmed")}
-                    onViewOrder={setSelectedOrder}
+                    onViewOrder={handleViewOrder}
                   />
                 </TabsContent>
 
                 <TabsContent value="in_transit" className="space-y-4">
                   <OrdersTable
                     orders={mockOrders.filter((o) => o.status === "in_transit")}
-                    onViewOrder={setSelectedOrder}
+                    onViewOrder={handleViewOrder}
                   />
                 </TabsContent>
 
                 <TabsContent value="delivered" className="space-y-4">
-                  <OrdersTable orders={mockOrders.filter((o) => o.status === "delivered")} onViewOrder={setSelectedOrder} />
+                  <OrdersTable orders={mockOrders.filter((o) => o.status === "delivered")} onViewOrder={handleViewOrder} />
                 </TabsContent>
               </Tabs>
             </TabsContent>

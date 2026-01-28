@@ -65,7 +65,7 @@ export function ConsolidatedShippingCalculator() {
   const [calculation, setCalculation] = useState<ShippingCalculation | null>(null)
 
   const addOrder = () => {
-    if (!newOrder.clientName || !newOrder.productName || !newOrder.weightLbs) {
+    if (!newOrder.clientName) {
       alert("Por favor complete todos los campos requeridos");
       return;
     }

@@ -8,14 +8,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, login, isLoading, error } = useAuth()
+  const { isAuthenticated, login, signUp, isLoading, error } = useAuth()
 
   if (!isAuthenticated) {
     return (
       <AdminLogin 
         onLogin={login}
+        onSignUp={signUp}
         error={error || undefined}
         isLoading={isLoading}
+        showSignUp={true}
       />
     )
   }

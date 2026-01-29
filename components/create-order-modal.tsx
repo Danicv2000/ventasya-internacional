@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calculator, Save } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 interface CreateOrderModalProps {
   isOpen: boolean
@@ -359,9 +360,24 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
                     <SelectValue placeholder="Seleccionar tienda" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Temu">Temu</SelectItem>
-                    <SelectItem value="Shein">Shein</SelectItem>
-                    <SelectItem value="Amazon">Amazon</SelectItem>
+                    <SelectItem value="Temu">
+                      <div className="flex items-center gap-2">
+                        <TemuIcon className="w-4 h-4" />
+                        <span>Temu</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Shein">
+                      <div className="flex items-center gap-2">
+                        <SheinIcon className="w-4 h-4" />
+                        <span>Shein</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Amazon">
+                      <div className="flex items-center gap-2">
+                        <AmazonIcon className="w-4 h-4" />
+                        <span>Amazon</span>
+                      </div>
+                    </SelectItem>
                     <SelectItem value="Otro">Otro</SelectItem>
                   </SelectContent>
                 </Select>

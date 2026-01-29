@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertCircle, ShoppingCart, Sparkles, Send } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 export function OrderForm() {
   const [formData, setFormData] = useState({
@@ -120,9 +121,24 @@ export function OrderForm() {
                     <SelectValue placeholder="Selecciona la tienda" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Temu">Temu</SelectItem>
-                    <SelectItem value="Shein">Shein</SelectItem>
-                    <SelectItem value="Amazon">Amazon</SelectItem>
+                    <SelectItem value="Temu">
+                      <div className="flex items-center gap-2">
+                        <TemuIcon className="w-4 h-4" />
+                        <span>Temu</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Shein">
+                      <div className="flex items-center gap-2">
+                        <SheinIcon className="w-4 h-4" />
+                        <span>Shein</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Amazon">
+                      <div className="flex items-center gap-2">
+                        <AmazonIcon className="w-4 h-4" />
+                        <span>Amazon</span>
+                      </div>
+                    </SelectItem>
                     <SelectItem value="Otro">Otro</SelectItem>
                   </SelectContent>
                 </Select>

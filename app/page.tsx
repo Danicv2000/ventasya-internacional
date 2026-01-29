@@ -20,6 +20,7 @@ import {
   Heart,
 } from "lucide-react"
 import { useEffect, useState } from "react"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(false)
@@ -327,29 +328,33 @@ export default function HomePage() {
                 description: "Miles de productos con precios increíbles y envío rápido",
                 gradient: "from-orange-400 to-red-500",
                 bgGradient: "from-orange-50 to-red-50",
-                emoji: "🛒",
+                icon: <TemuIcon className="w-16 h-16" />,
               },
               {
                 name: "SHEIN",
                 description: "Moda moderna y accesorios con las últimas tendencias",
                 gradient: "from-pink-400 to-purple-500",
                 bgGradient: "from-pink-50 to-purple-50",
-                emoji: "👗",
+                icon: <SheinIcon className="w-16 h-16" />,
               },
               {
                 name: "AMAZON",
                 description: "La mayor selección de productos de todas las categorías",
                 gradient: "from-blue-400 to-cyan-500",
                 bgGradient: "from-blue-50 to-cyan-50",
-                emoji: "📦",
+                icon: <AmazonIcon className="w-16 h-16" />,
               },
             ].map((store, i) => (
               <Card key={i} className={`p-12 text-center space-y-6 group hover:shadow-3xl hover:scale-110 hover:-translate-y-6 transition-all duration-500 cursor-pointer relative overflow-hidden bg-gradient-to-br ${store.bgGradient} border-3 hover:border-opacity-50`}>
                 <div className={`absolute inset-0 bg-gradient-to-br ${store.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
 
                 <div className="relative z-10">
-                  <div className="text-6xl mb-4 animate-bounce">{store.emoji}</div>
-                  <div className={`text-6xl font-extrabold bg-gradient-to-r ${store.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>
+                  <div className="mb-6 flex justify-center">
+                    <div className="animate-bounce transform transition-transform duration-300 group-hover:scale-110">
+                      {store.icon}
+                    </div>
+                  </div>
+                  <div className={`text-5xl font-extrabold bg-gradient-to-r ${store.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>
                     {store.name}
                   </div>
                   <p className="text-gray-600 mt-6 leading-relaxed text-xl">{store.description}</p>

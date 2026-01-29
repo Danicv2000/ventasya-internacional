@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 interface Order {
   id: string
@@ -88,7 +89,12 @@ export function OrdersTable({ orders, onViewOrder }: OrdersTableProps) {
                 <p className="truncate">{order.productName}</p>
               </td>
               <td className="py-4 px-4">
-                <Badge variant="outline">{order.storeName}</Badge>
+                <Badge variant="outline" className="flex items-center gap-2">
+                  {order.storeName === 'Temu' && <TemuIcon className="w-4 h-4" />}
+                  {order.storeName === 'Shein' && <SheinIcon className="w-4 h-4" />}
+                  {order.storeName === 'Amazon' && <AmazonIcon className="w-4 h-4" />}
+                  <span>{order.storeName}</span>
+                </Badge>
               </td>
               <td className="py-4 px-4 text-right">
                 <div className="text-sm">

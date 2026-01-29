@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { BarChart, TrendingUp, DollarSign, Package, Download } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 // Mock data for reports
 const monthlyData = [
@@ -245,7 +246,9 @@ export function ReportsSystem() {
             {storeData.map((data) => (
               <Card key={data.store} className="p-6 text-center">
                 <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Package className="size-8 text-primary" />
+                  {data.store === 'Temu' && <TemuIcon className="w-8 h-8" />}
+                  {data.store === 'Shein' && <SheinIcon className="w-8 h-8" />}
+                  {data.store === 'Amazon' && <AmazonIcon className="w-8 h-8" />}
                 </div>
                 <h4 className="font-bold text-xl mb-1">{data.store}</h4>
                 <p className="text-sm text-muted-foreground mb-3">{data.orders} pedidos totales</p>

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Package, MapPin, DollarSign } from "lucide-react"
+import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
 
 interface Order {
   id: string
@@ -108,7 +109,12 @@ export function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
               </div>
               <div>
                 <p className="text-muted-foreground">Tienda</p>
-                <Badge variant="outline">{order.storeName}</Badge>
+                <Badge variant="outline" className="flex items-center gap-2">
+                  {order.storeName === 'Temu' && <TemuIcon className="w-4 h-4" />}
+                  {order.storeName === 'Shein' && <SheinIcon className="w-4 h-4" />}
+                  {order.storeName === 'Amazon' && <AmazonIcon className="w-4 h-4" />}
+                  <span>{order.storeName}</span>
+                </Badge>
               </div>
             </div>
           </div>

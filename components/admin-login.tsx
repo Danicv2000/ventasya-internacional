@@ -10,19 +10,51 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
 interface AdminLoginProps {
-  onLogin: (credentials: { username: string; password: string }) => void
+  onLogin: (credentials: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>
+  onSignUp?: (credentials: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>
   error?: string
   isLoading?: boolean
+  showSignUp?: boolean
 }
 
-export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
-  const [username, setUsername] = useState("")
+export function AdminLogin({ onLogin, onSignUp, error, isLoading, showSignUp = false }: AdminLoginProps) {
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isSignUpMode, setIsSignUpMode] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onLogin({ username, password })
+    setLocalError(null)
+    
+    if (isSignUpMode && onSignUp) {
+      if (password !== confirmPassword) {
+        setLocalError("Las contraseñas no coinciden")
+        return
+      }
+      if (password.length < 6) {
+        setLocalError("La contraseña debe tener al menos 6 caracteres")
+        return
+      }
+      const result = await onSignUp({ email, password })
+      if (!result.success) {
+        setLocalError(result.error || 'Error desconocido')
+      }
+    } else {
+      const result = await onLogin({ email, password })
+      if (!result.success) {
+        setLocalError(result.error || 'Error desconocido')
+      }
+    }
+  }
+
+  const toggleMode = () => {
+    setIsSignUpMode(!isSignUpMode)
+    setLocalError(null)
+    setConfirmPassword("")
   }
 
   return (
@@ -54,11 +86,14 @@ export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
           </div>
           
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Panel de Administración
+            {isSignUpMode ? "Crear Cuenta" : "Panel de Administración"}
           </h1>
           
           <p className="text-gray-600 mb-4">
-            Ingresa tus credenciales para acceder
+            {isSignUpMode 
+              ? "Crea una cuenta para acceder al panel de administración" 
+              : "Ingresa tus credenciales para acceder"
+            }
           </p>
 
           <Badge className="bg-gradient-to-r from-red-100 to-orange-100 text-red-700 border border-red-200">
@@ -69,16 +104,16 @@ export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+            <Label htmlFor="email" className="text-lg font-semibold text-gray-700 flex items-center gap-2">
               <User className="size-5 text-blue-600" />
-              Usuario
+              Correo Electrónico
             </Label>
             <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Ingresa tu usuario"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@ejemplo.com"
               required
               className="text-lg p-4 border-2 border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-300 rounded-xl"
             />
@@ -95,8 +130,9 @@ export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Ingresa tu contraseña"
+                placeholder={isSignUpMode ? "Crea una contraseña" : "Ingresa tu contraseña"}
                 required
+                minLength={isSignUpMode ? 6 : undefined}
                 className="text-lg p-4 pr-12 border-2 border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-300 rounded-xl"
               />
               <Button
@@ -115,31 +151,80 @@ export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
             </div>
           </div>
 
-          {error && (
+          {(error || localError) && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 animate-shake">
               <AlertCircle className="size-5 text-red-500 flex-shrink-0" />
-              <p className="text-red-700 font-medium">{error}</p>
+              <p className="text-red-700 font-medium">{error || localError}</p>
+            </div>
+          )}
+
+          {isSignUpMode && (
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                <Lock className="size-5 text-blue-600" />
+                Confirmar Contraseña
+              </Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirma tu contraseña"
+                  required
+                  className="text-lg p-4 pr-12 border-2 border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-300 rounded-xl"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-blue-50"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="size-5 text-gray-500" />
+                  ) : (
+                    <Eye className="size-5 text-gray-500" />
+                  )}
+                </Button>
+              </div>
             </div>
           )}
 
           <Button
             type="submit"
-            disabled={isLoading || !username || !password}
+            disabled={isLoading || !email || !password || (isSignUpMode && password !== confirmPassword)}
             className="w-full text-lg py-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                Verificando...
+                {isSignUpMode ? "Creando cuenta..." : "Verificando..."}
               </>
             ) : (
               <>
                 <Shield className="size-5 mr-3" />
-                🔓 Iniciar Sesión
+                {isSignUpMode ? "📝 Crear Cuenta" : "🔓 Iniciar Sesión"}
               </>
             )}
           </Button>
         </form>
+
+        {showSignUp && (
+          <div className="mt-4 text-center">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={toggleMode}
+              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+            >
+              {isSignUpMode 
+                ? "¿Ya tienes cuenta? Inicia sesión" 
+                : "¿No tienes cuenta? Regístrate"
+              }
+            </Button>
+          </div>
+        )}
 
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-4">
@@ -149,7 +234,7 @@ export function AdminLogin({ onLogin, error, isLoading }: AdminLoginProps) {
             </h3>
             <div className="text-sm text-blue-700 space-y-1">
               <p>• Solo administradores autorizados</p>
-              <p>• Credenciales proporcionadas por el sistema</p>
+              <p>• Sistema de autenticación seguro con Supabase</p>
               <p>• Acceso monitoreado y registrado</p>
             </div>
           </div>

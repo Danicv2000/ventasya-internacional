@@ -1,14 +1,15 @@
 // AI-Powered Web Scraping Service
-// Uses llm-scraper to extract product information from any website
+// Uses Groq API for AI-powered scraping without heavy browser dependencies
 
 import { z } from "zod";
-import { chromium } from "playwright";
-import LLMScraper from "llm-scraper";
-import { openai } from "@ai-sdk/openai";
-import * as dotenv from "dotenv";
+import { createOpenAI } from "@ai-sdk/openai";
+import * as cheerio from "cheerio";
 
-// Load environment variables
-dotenv.config();
+// Configure Groq API
+const groq = createOpenAI({
+  baseURL: process.env.OPENAI_BASE_URL,
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Define the product schema for extraction
 const ProductSchema = z.object({
@@ -20,8 +21,6 @@ const ProductSchema = z.object({
   availability: z.string().optional().describe("Stock status"),
   brand: z.string().optional().describe("Product brand/manufacturer"),
   category: z.string().optional().describe("Product category"),
-  features: z.array(z.string()).optional().describe("Key product features"),
-  specifications: z.record(z.string()).optional().describe("Technical specifications"),
 });
 
 type ProductData = z.infer<typeof ProductSchema>;
@@ -31,8 +30,8 @@ class AIWebScraperService {
   private llm: any;
 
   private constructor() {
-    // Initialize OpenAI LLM
-    this.llm = openai.chat("gpt-4o-mini"); // Using gpt-4o-mini for cost efficiency
+    // Initialize Groq LLM
+    this.llm = groq("llama3-8b-8192"); // Using llama3 for cost efficiency
   }
 
   public static getInstance(): AIWebScraperService {
@@ -48,107 +47,92 @@ class AIWebScraperService {
    * @returns Extracted product data or null if failed
    */
   async scrapeProduct(url: string): Promise<ProductData | null> {
-    let browser;
     try {
       console.log(`[AI Scraper] Starting scrape for: ${url}`);
       
-      // Launch browser
-      browser = await chromium.launch({
-        headless: true, // Set to false for debugging
+      // Fetch the webpage content
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       });
       
-      const page = await browser.newPage();
+      if (!response.ok) {
+        throw new Error(`Failed to fetch URL: ${response.status}`);
+      }
       
-      // Set realistic browser headers
-      await page.setExtraHTTPHeaders({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      const html = await response.text();
+      
+      // Parse HTML with Cheerio
+      const $ = cheerio.load(html);
+      
+      // Extract key information
+      const title = $('title').text() || $('h1').first().text() || '';
+      const metaDescription = $('meta[name="description"]').attr('content') || '';
+      
+      // Prepare prompt for AI analysis
+      const prompt = `
+      Analyze this webpage content and extract product information:
+      
+      Title: ${title}
+      Description: ${metaDescription}
+      URL: ${url}
+      
+      Content excerpt:
+      ${$('body').text().substring(0, 2000)}
+      
+      Please extract the following information in JSON format:
+      - name: Product name/title
+      - price: Product price with currency
+      - description: Product description
+      - imageUrl: Main product image URL
+      - rating: Product rating/reviews
+      - availability: Stock status
+      - brand: Product brand
+      - category: Product category
+      
+      Return only valid JSON, no other text.
+      `;
+      
+      // Use Groq AI to extract structured data
+      const result = await this.llm.doGenerate({
+        inputFormat: 'prompt',
+        mode: { type: 'regular' },
+        prompt,
       });
       
-      // Navigate to the page
-      console.log('[AI Scraper] Navigating to page...');
-      await page.goto(url, { 
-        waitUntil: 'networkidle', 
-        timeout: 30000 
-      });
+      if (result.text) {
+        try {
+          const jsonData = JSON.parse(result.text);
+          const parsed = ProductSchema.parse(jsonData);
+          console.log('[AI Scraper] Successfully extracted product data');
+          return parsed;
+        } catch (parseError) {
+          console.error('[AI Scraper] Failed to parse AI response:', parseError);
+          // Return basic extracted data
+          return {
+            name: title || "Product name not found",
+            price: "Price not available",
+            description: metaDescription || "No description available",
+            imageUrl: "",
+            rating: "",
+            availability: "Unknown",
+            brand: "Unknown",
+            category: "General"
+          };
+        }
+      }
       
-      // Wait for page to load completely
-      await page.waitForTimeout(2000);
-      
-      // Initialize LLM scraper
-      const scraper = new LLMScraper(this.llm);
-      
-      // Extract product data using AI
-      console.log('[AI Scraper] Extracting product data with AI...');
-      const result = await scraper.run(page, ProductSchema, {
-        format: 'html'
-      });
-      
-      await page.close();
-      
-      console.log('[AI Scraper] Successfully extracted product data');
-      return result.data[0] || null; // Return the first result object
+      return null;
       
     } catch (error) {
       console.error('[AI Scraper] Error scraping product:', error);
       return null;
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
-    }
-  }
-
-  /**
-   * Scrape multiple products from search results or category pages
-   * @param url The search/category page URL
-   * @param maxProducts Maximum number of products to extract
-   * @returns Array of product data
-   */
-  async scrapeMultipleProducts(url: string, maxProducts: number = 10): Promise<ProductData[]> {
-    let browser;
-    try {
-      console.log(`[AI Scraper] Starting multi-product scrape for: ${url}`);
-      
-      browser = await chromium.launch({ headless: true });
-      const page = await browser.newPage();
-      
-      await page.setExtraHTTPHeaders({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      });
-      
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForTimeout(2000);
-      
-      const scraper = new LLMScraper(this.llm);
-      
-      // Schema for multiple products
-      const ProductsSchema = z.object({
-        products: z.array(ProductSchema).max(maxProducts)
-      });
-      
-      const result = await scraper.run(page, ProductsSchema, {
-        format: 'html'
-      });
-      
-      await page.close();
-      
-      console.log(`[AI Scraper] Successfully extracted ${result.data.length} products`);
-      return result.data[0]?.products || []; // Return the products array from the first result
-      
-    } catch (error) {
-      console.error('[AI Scraper] Error scraping multiple products:', error);
-      return [];
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
     }
   }
 
   /**
    * Validate and clean scraped product data
-   * @param product Raw scraped product data
-   * @returns Cleaned and validated product data
    */
   cleanProductData(product: any): ProductData {
     // Clean price (extract numeric value)
@@ -161,7 +145,7 @@ class AIWebScraperService {
     
     // Clean image URLs
     if (product.imageUrl && !product.imageUrl.startsWith('http')) {
-      product.imageUrl = null;
+      product.imageUrl = "";
     }
     
     // Ensure required fields
@@ -173,8 +157,6 @@ class AIWebScraperService {
 
   /**
    * Format product data for display
-   * @param product Product data
-   * @returns Formatted string
    */
   formatProductForDisplay(product: ProductData): string {
     let output = `**${product.name}**\n`;

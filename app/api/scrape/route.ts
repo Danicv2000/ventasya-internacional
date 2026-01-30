@@ -49,3 +49,17 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET() {
+  return NextResponse.json({
+    message: 'AI Web Scraping API',
+    description: 'Scrape product data from any website using AI',
+    endpoint: 'POST /api/scrape',
+    parameters: {
+      url: 'The website URL to scrape'
+    },
+    example: {
+      url: 'https://example-store.com/product/123'
+    }
+  });
+}

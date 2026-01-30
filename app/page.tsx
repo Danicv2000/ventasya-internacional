@@ -18,6 +18,7 @@ import {
   Star,
   ArrowRight,
   Heart,
+  ShoppingBag
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { TemuIcon, SheinIcon, AmazonIcon } from '@/components/platform-icons'
@@ -122,11 +123,23 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-              <Link href="/calculadora">
+              <Link href="/tiendas">
                 <Button size="lg" className="w-full sm:w-auto text-xl px-12 py-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 group">
-                  <Zap className="size-6 mr-3 group-hover:rotate-12 transition-transform animate-pulse" />
-                  🚀 Comenzar Pedido
+                  <ShoppingBag className="size-6 mr-3 group-hover:rotate-12 transition-transform animate-pulse" />
+                  🛍️ Buscar Productos
                   <ArrowRight className="size-6 ml-3 group-hover:translate-x-2 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/scraper">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-xl px-12 py-6 border-3 border-purple-300 hover:bg-purple-50 hover:border-purple-500 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 bg-white/80 backdrop-blur">
+                  <Sparkles className="size-6 mr-3 group-hover:rotate-12 transition-transform text-purple-600" />
+                  🤖 Buscador AI
+                </Button>
+              </Link>
+              <Link href="/calculadora">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-xl px-12 py-6 border-3 border-blue-300 hover:bg-blue-50 hover:border-blue-500 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 bg-white/80 backdrop-blur">
+                  <Zap className="size-6 mr-3 group-hover:rotate-12 transition-transform" />
+                  🧮 Calculadora
                 </Button>
               </Link>
               <Link href="#como-funciona">
@@ -328,21 +341,21 @@ export default function HomePage() {
                 description: "Miles de productos con precios increíbles y envío rápido",
                 gradient: "from-orange-400 to-red-500",
                 bgGradient: "from-orange-50 to-red-50",
-                icon: <TemuIcon className="w-16 h-16" />,
+                icon: <TemuIcon className="w-32 h-20 md:w-40 md:h-24" />,
               },
               {
                 name: "SHEIN",
                 description: "Moda moderna y accesorios con las últimas tendencias",
                 gradient: "from-pink-400 to-purple-500",
                 bgGradient: "from-pink-50 to-purple-50",
-                icon: <SheinIcon className="w-16 h-16" />,
+                icon: <SheinIcon className="w-32 h-20 md:w-40 md:h-24" />,
               },
               {
                 name: "AMAZON",
                 description: "La mayor selección de productos de todas las categorías",
                 gradient: "from-blue-400 to-cyan-500",
                 bgGradient: "from-blue-50 to-cyan-50",
-                icon: <AmazonIcon className="w-16 h-16" />,
+                icon: <AmazonIcon className="w-32 h-20 md:w-40 md:h-24" />,
               },
             ].map((store, i) => (
               <Card key={i} className={`p-12 text-center space-y-6 group hover:shadow-3xl hover:scale-110 hover:-translate-y-6 transition-all duration-500 cursor-pointer relative overflow-hidden bg-gradient-to-br ${store.bgGradient} border-3 hover:border-opacity-50`}>
@@ -353,9 +366,6 @@ export default function HomePage() {
                     <div className="animate-bounce transform transition-transform duration-300 group-hover:scale-110">
                       {store.icon}
                     </div>
-                  </div>
-                  <div className={`text-5xl font-extrabold bg-gradient-to-r ${store.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>
-                    {store.name}
                   </div>
                   <p className="text-gray-600 mt-6 leading-relaxed text-xl">{store.description}</p>
                 </div>
@@ -385,11 +395,23 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-            <Link href="/calculadora">
+            <Link href="/tiendas">
               <Button size="lg" className="w-full sm:w-auto text-2xl px-12 py-6 bg-white text-gray-800 hover:bg-gray-100 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 group">
-                <Zap className="size-6 mr-3 group-hover:rotate-12 transition-transform text-blue-600" />
-                🚀 Hacer Pedido Ahora
+                <ShoppingBag className="size-6 mr-3 group-hover:rotate-12 transition-transform text-blue-600" />
+                🛍️ Explorar Tiendas
                 <ArrowRight className="size-6 ml-3 group-hover:translate-x-2 transition-transform text-blue-600" />
+              </Button>
+            </Link>
+            <Link href="/scraper">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-2xl px-12 py-6 border-3 border-white hover:bg-white/20 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-white">
+                <Sparkles className="size-6 mr-3 group-hover:rotate-12 transition-transform" />
+                🤖 Buscador AI
+              </Button>
+            </Link>
+            <Link href="/calculadora">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-2xl px-12 py-6 border-3 border-white hover:bg-white/20 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-white">
+                <Zap className="size-6 mr-3 group-hover:rotate-12 transition-transform" />
+                🧮 Calculadora
               </Button>
             </Link>
           </div>

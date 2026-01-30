@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,7 +24,25 @@ export function OrderForm() {
     clientNotes: "",
   })
 
+  const [prefilledProduct, setPrefilledProduct] = useState<any>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Check for prefilled product data from marketplace
+  useEffect(() => {
+    const storedProduct = sessionStorage.getItem('selectedProduct')
+    if (storedProduct) {
+      const product = JSON.parse(storedProduct)
+      setPrefilledProduct(product)
+      setFormData(prev => ({
+        ...prev,
+        productUrl: product.productUrl || "",
+        productName: product.productName || "",
+        storeName: product.storeName || "",
+      }))
+      // Clear the session storage after using it
+      sessionStorage.removeItem('selectedProduct')
+    }
+  }, [])
 
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -55,7 +73,7 @@ export function OrderForm() {
   }
 
   const isFormValid =
-    formData.clientName && formData.clientPhone && formData.productUrl && formData.productName && formData.storeName
+    formData.clientName && formData.clientPhone && (formData.productUrl || prefilledProduct?.productUrl) && (formData.productName || prefilledProduct?.productName) && formData.storeName
 
   return (
     <div className="max-w-3xl mx-auto">

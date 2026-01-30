@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,10 +33,29 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
     notes: "",
   })
 
+  const [prefilledProduct, setPrefilledProduct] = useState<any>(null)
   const [exchangeRate, setExchangeRate] = useState("420")
   const [ordersInPackage, setOrdersInPackage] = useState("4") // Número estimado de pedidos por paquete
 
   const [priceBreakdown, setPriceBreakdown] = useState<any>(null)
+
+  // Check for prefilled product data from marketplace
+  useEffect(() => {
+    const storedProduct = sessionStorage.getItem('selectedProduct')
+    if (storedProduct) {
+      const product = JSON.parse(storedProduct)
+      setPrefilledProduct(product)
+      setFormData(prev => ({
+        ...prev,
+        productUrl: product.productUrl || "",
+        productName: product.productName || "",
+        storeName: product.storeName || "",
+        productPriceUSD: product.productPriceUSD || "",
+      }))
+      // Clear the session storage after using it
+      sessionStorage.removeItem('selectedProduct')
+    }
+  }, [])
 
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -160,8 +179,8 @@ export function CreateOrderModal({ isOpen, onClose, onSave }: CreateOrderModalPr
   const isFormValid =
     formData.clientName &&
     formData.clientPhone &&
-    formData.productName &&
-    formData.productPriceUSD
+    (formData.productName || prefilledProduct?.productName) &&
+    (formData.productPriceUSD || prefilledProduct?.productPriceUSD)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

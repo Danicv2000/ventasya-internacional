@@ -21,6 +21,8 @@ const ProductSchema = z.object({
   availability: z.string().optional().describe("Stock status"),
   brand: z.string().optional().describe("Product brand/manufacturer"),
   category: z.string().optional().describe("Product category"),
+  features: z.array(z.string()).optional().describe("Product features"),
+  specifications: z.record(z.string()).optional().describe("Product specifications as key-value pairs"),
 });
 
 type ProductData = z.infer<typeof ProductSchema>;

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/ventasya-internacional',
+  assetPrefix: '/ventasya-internacional/',
+  trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -6,6 +6,13 @@ Bienvenido a la documentación completa para el despliegue de Ventasya Internaci
 
 ### 🚀 **Guías Principales**
 
+#### [ARQUITECTURA_MODULAR.md](./docs/ARQUITECTURA_MODULAR.md)
+Documentación completa de la nueva arquitectura modular.
+- Estructura de directorios
+- Convenciones de nomenclatura
+- Beneficios de la arquitectura
+- Rutas de importación
+
 #### [DEPLOYMENT-GUIDE.md](./docs/DEPLOYMENT-GUIDE.md)
 Guía completa paso a paso para desplegar en GitHub Pages.
 - Configuración del proyecto
@@ -58,6 +65,7 @@ Respuestas a preguntas frecuentes.
 - **Hosting**: GitHub Pages
 - **Lenguaje**: TypeScript
 - **Estilos**: Tailwind CSS
+- **Arquitectura**: Modular (Feature-Sliced Design)
 
 ---
 
@@ -66,7 +74,13 @@ Respuestas a preguntas frecuentes.
 ```
 ventasya-internacional/
 ├── app/                 # Páginas de la aplicación
-├── components/          # Componentes reutilizables
+├── src/                 # Código fuente modularizado
+│   ├── core/            # Componentes y funcionalidades centrales
+│   ├── features/        # Características específicas del negocio
+│   ├── shared/          # Recursos compartidos
+│   ├── utils/           # Utilidades y funciones auxiliares
+│   └── services/        # Servicios externos e integraciones
+├── components/          # Componentes reutilizables (migrados al nuevo esquema)
 ├── contexts/            # Context providers
 ├── lib/                 # Librerías y utilidades
 ├── public/              # Assets estáticos

@@ -1,0 +1,136 @@
+{
+  "common": {
+    "welcome": "Bienvenue sur EncargosYa",
+    "home": "Accueil",
+    "stores": "Magasins",
+    "calculator": "Calculateur",
+    "orders": "Commandes",
+    "tracking": "Suivi",
+    "support": "Support",
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "logout": "Se déconnecter",
+    "back": "Retour",
+    "continue": "Continuer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "settings": "Paramètres",
+    "not_found": "Colis manquant",
+    "page_not_found": "Il semble que la page que vous recherchez ne soit pas dans notre inventaire. Ne vous inquiétez pas ! Nous pouvons vous aider à retrouver votre chemin.",
+    "go_home": "Retour à l'accueil",
+    "contact_support": "Contacter le support",
+    "system_status": "État du système",
+    "help": "Aide",
+    "email": "Email",
+    "email_placeholder": "exemple@ventasya.com",
+    "password": "Mot de passe",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Mot de passe oublié ?",
+    "access_restricted": "Accès restreint",
+    "login_required": "Vous devez vous connecter pour voir cette section.",
+    "or": "Ou aussi",
+    "copyright": "© 2024 VentasYa. Tous droits réservés.",
+    "no_permissions": "Aucune autorisation",
+    "permission_denied": "Votre compte ne dispose pas du niveau d'accès requis pour cette ressource. Contactez votre administrateur si vous pensez qu'il s'agit d'une erreur.",
+    "request_access": "Demander l'accès",
+    "logout_other_account": "Se déconnecter et essayer avec un autre compte",
+    "technical_difficulties": "Nous rencontrons une petite difficulté technique.",
+    "engineers_working": "Nos ingénieurs travaillent déjà à rétablir la connexion. Veuillez essayer de recharger dans quelques minutes.",
+    "refresh_page": "Actualiser la page",
+    "systems_maintenance": "Systèmes en maintenance",
+    "working_normal": "Nous travaillons pour revenir à la normale.",
+    "error_code_500": "Code d'erreur : 500 Erreur Interne du Serveur",
+    "coming_soon_2024": "À venir en 2024",
+    "coming_soon_big": "Quelque chose de grand arrive",
+    "coming_soon_hands": "entre vos mains.",
+    "coming_soon_details": "Nous peaufinons les derniers détails pour que vous puissiez acheter dans le monde entier depuis Cuba comme jamais auparavant.",
+    "notify_me": "Me notifier",
+    "be_first_to_know": "Soyez le premier informé",
+    "launch": "Lancement",
+    "very_soon": "Très bientôt",
+    "shipping": "Expédition",
+    "global": "Global",
+    "guarantee": "100 % garanti"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "calculator": "Calculateur d'Expédition",
+    "stores": "Magasins",
+    "orders": "Mes Commandes",
+    "admin": "Panneau d'Administration"
+  },
+  "hero": {
+    "title": "Pas de tracas, pas de complications, juste vos achats.",
+    "subtitle": "Achetez dans vos magasins préférés aux États-Unis et dans le monde. Nous nous occupons des douanes, du transport et de la livraison directement à votre porte à Cuba.",
+    "cta": "Commencer à acheter"
+  },
+  "calculator": {
+    "title": "Calculateur d'Expédition",
+    "store": "Magasin d'Origine",
+    "weight": "Poids du colis (kg)",
+    "value": "Valeur des articles (USD)",
+    "estimated": "Total estimé",
+    "includes": "Inclut l'expédition, les droits et les frais de manutention",
+    "delivery_time": "Livraison estimée : 10-15 jours ouvrables."
+  },
+  "stores": {
+    "title": "Choisissez votre magasin préféré",
+    "description": "Parcourez les meilleurs magasins internationaux comme si vous faisiez vos achats directement auprès d'eux. Trouvez ce que vous cherchez et laissez-nous vous le ramener.",
+    "explore": "Explorer {store}",
+    "temu": {
+      "name": "TEMU",
+      "description": "Des milliers de produits avec des prix incroyables et une expédition rapide",
+      "features": [
+        "Prix jusqu'à 90 % inférieurs",
+        "Expédition rapide",
+        "Produits de qualité garantis"
+      ]
+    },
+    "shein": {
+      "name": "SHEIN",
+      "description": "Mode moderne et accessoires avec les dernières tendances",
+      "features": [
+        "Dernières tendances de la mode",
+        "Nouveaux produits hebdomadaires",
+        "Tailles pour toutes les silhouettes"
+      ]
+    },
+    "amazon": {
+      "name": "AMAZON",
+      "description": "La plus grande sélection de produits dans toutes les catégories",
+      "features": [
+        "Des millions de produits disponibles",
+        "Expédition Prime rapide",
+        "Garantie de satisfaction"
+      ]
+    }
+  },
+  "tracking": {
+    "title": "Suivi en temps réel",
+    "description": "Notre système de suivi GPS vous permet de connaître l'emplacement exact de votre colis à tout moment, depuis qu'il quitte le magasin jusqu'à ce qu'il arrive chez vous.",
+    "status": "Statut",
+    "location": "Emplacement",
+    "transit": "En transit",
+    "delivered": "Livré",
+    "in_transit": "En transit",
+    "pending": "En attente"
+  },
+  "footer": {
+    "about": "À propos",
+    "blog": "Blog",
+    "careers": "Emplois",
+    "press": "Presse",
+    "help_center": "Centre d'aide",
+    "contact": "Contact",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Confidentialité",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "youtube": "YouTube"
+  }
+}

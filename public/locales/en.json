@@ -1,0 +1,136 @@
+{
+  "common": {
+    "welcome": "Welcome to EncargosYa",
+    "home": "Home",
+    "stores": "Stores",
+    "calculator": "Calculator",
+    "orders": "Orders",
+    "tracking": "Tracking",
+    "support": "Support",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "back": "Back",
+    "continue": "Continue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "settings": "Settings",
+    "not_found": "Missing Package",
+    "page_not_found": "Looks like the page you're looking for isn't in our inventory. Don't worry! We can help you find your way back.",
+    "go_home": "Go Home",
+    "contact_support": "Contact Support",
+    "system_status": "System Status",
+    "help": "Help",
+    "email": "Email",
+    "email_placeholder": "example@ventasya.com",
+    "password": "Password",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Forgot your password?",
+    "access_restricted": "Access Restricted",
+    "login_required": "You need to log in to view this section.",
+    "or": "Or",
+    "copyright": "© 2024 VentasYa. All rights reserved.",
+    "no_permissions": "No Permissions",
+    "permission_denied": "Your account doesn't have the required access level for this resource. Contact your administrator if you believe this is an error.",
+    "request_access": "Request Access",
+    "logout_other_account": "Log Out and try with another account",
+    "technical_difficulties": "We're having a small technical difficulty.",
+    "engineers_working": "Our engineers are already working to restore the connection. Please try reloading in a few minutes.",
+    "refresh_page": "Refresh Page",
+    "systems_maintenance": "Systems under maintenance",
+    "working_normal": "We are working to return to normal.",
+    "error_code_500": "Error code: 500 Internal Server Error",
+    "coming_soon_2024": "Coming Soon 2024",
+    "coming_soon_big": "Something big is coming",
+    "coming_soon_hands": "into your hands.",
+    "coming_soon_details": "We're fine-tuning the final details so you can shop the world from Cuba like never before.",
+    "notify_me": "Notify Me",
+    "be_first_to_know": "Be the first to know",
+    "launch": "Launch",
+    "very_soon": "Very Soon",
+    "shipping": "Shipping",
+    "global": "Global",
+    "guarantee": "100% Guaranteed"
+  },
+  "navigation": {
+    "home": "Home",
+    "calculator": "Shipping Calculator",
+    "stores": "Stores",
+    "orders": "My Orders",
+    "admin": "Admin Panel"
+  },
+  "hero": {
+    "title": "No hassles, no complications, just your purchases.",
+    "subtitle": "Shop from your favorite US and world stores. We handle customs, transport, and delivery right to your door in Cuba.",
+    "cta": "Start Shopping"
+  },
+  "calculator": {
+    "title": "Shipping Calculator",
+    "store": "Origin Store",
+    "weight": "Package Weight (kg)",
+    "value": "Item Value (USD)",
+    "estimated": "Estimated Total",
+    "includes": "Includes shipping, duties, and handling",
+    "delivery_time": "Estimated delivery: 10-15 business days."
+  },
+  "stores": {
+    "title": "Choose Your Favorite Store",
+    "description": "Browse the best international stores as if you were shopping directly from them. Find what you're looking for and let us bring it to you.",
+    "explore": "Explore {store}",
+    "temu": {
+      "name": "TEMU",
+      "description": "Thousands of products with incredible prices and fast shipping",
+      "features": [
+        "Prices up to 90% lower",
+        "Fast shipping",
+        "Quality guaranteed products"
+      ]
+    },
+    "shein": {
+      "name": "SHEIN",
+      "description": "Modern fashion and accessories with the latest trends",
+      "features": [
+        "Latest fashion trends",
+        "Weekly new merchandise",
+        "Sizes for all figures"
+      ]
+    },
+    "amazon": {
+      "name": "AMAZON",
+      "description": "The largest selection of products in all categories",
+      "features": [
+        "Millions of available products",
+        "Fast Prime shipping",
+        "Satisfaction guarantee"
+      ]
+    }
+  },
+  "tracking": {
+    "title": "Real-Time Tracking",
+    "description": "Our GPS tracking system allows you to know the exact location of your package at all times, from when it leaves the store until it arrives at your home.",
+    "status": "Status",
+    "location": "Location",
+    "transit": "In Transit",
+    "delivered": "Delivered",
+    "in_transit": "In Transit",
+    "pending": "Pending"
+  },
+  "footer": {
+    "about": "About",
+    "blog": "Blog",
+    "careers": "Careers",
+    "press": "Press",
+    "help_center": "Help Center",
+    "contact": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "youtube": "YouTube"
+  }
+}

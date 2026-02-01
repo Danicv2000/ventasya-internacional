@@ -1,7 +1,8 @@
-import { ReportsSystem } from "@/components/reports-system"
+import { ReportsSystem } from "@/src/features/common/reports-system"
+import { Button } from "@/src/shared/ui/button"
 import { Package } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+
 
 export default function ReportsPage() {
   return (

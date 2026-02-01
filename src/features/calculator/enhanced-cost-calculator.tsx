@@ -1,14 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Calculator, RotateCcw, Sparkles, TrendingUp, DollarSign } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { ProfitabilityAdvisor } from "@/components/profitability-advisor"
+import { Card } from "@/src/shared/ui/card"
+import { Calculator, DollarSign, RotateCcw, Sparkles, TrendingUp } from "lucide-react"
+import { Label } from "@/src/shared/ui/label"
+import { Input } from "@/src/shared/ui/input"
+import { Button } from "@/src/shared/ui/button"
+import { Badge } from "@/src/shared/ui/badge"
+import { ProfitabilityAdvisor } from "./profitability-advisor"
 
 interface CalculationResult {
   productPriceUSD: number

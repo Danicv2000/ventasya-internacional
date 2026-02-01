@@ -1,7 +1,8 @@
 "use client"
 
 import { useAuth } from "@/src/core/contexts/auth-context"
-import { AdminLogin } from "@/components/admin-login"
+import { AdminLogin } from "../admin/admin-login"
+
 
 interface ProtectedRouteProps {
   children: React.ReactNode

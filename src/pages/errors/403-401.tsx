@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { Button } from '@/src/shared/ui/button';
-import { useI18n } from '@/src/hooks/use-i18n';
+// import { useI18n } from '@/src/shared/hooks/use-i18n';
 
 export default function UnauthorizedPage() {
-  const { t } = useI18n();
+  // const { t } = useI18n(); // Desactivado para evitar error de contexto
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-white transition-colors duration-300">
@@ -22,10 +22,10 @@ export default function UnauthorizedPage() {
             <h2 className="text-white text-xl font-bold leading-tight tracking-[-0.015em]">VentasYa</h2>
           </div>
           <div className="flex flex-1 justify-end gap-6 items-center">
-            <Link href="/status" className="text-sm text-slate-400 hover:text-white transition-colors">{t('common.system_status')}</Link>
+            <Link href="/status" className="text-sm text-slate-400 hover:text-white transition-colors">Estado del sistema</Link>
             <Link href="/help">
               <Button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-                <span className="truncate">{t('common.help')}</span>
+                <span className="truncate">Ayuda</span>
               </Button>
             </Link>
           </div>
@@ -44,8 +44,8 @@ export default function UnauthorizedPage() {
             
             {/* Error Messages */}
             <div className="text-center space-y-2">
-              <h1 className="text-white tracking-tight text-[32px] md:text-[40px] font-bold leading-tight px-4">401 - {t('common.access_restricted')}</h1>
-              <p className="text-slate-400 text-lg font-normal leading-normal px-4">{t('common.login_required')}</p>
+              <h1 className="text-white tracking-tight text-[32px] md:text-[40px] font-bold leading-tight px-4">401 - Acceso restringido</h1>
+              <p className="text-slate-400 text-lg font-normal leading-normal px-4">Inicio de sesión requerido</p>
             </div>
             
             {/* Login Card */}
@@ -53,22 +53,22 @@ export default function UnauthorizedPage() {
               <form className="space-y-6">
                 {/* Email Field */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-white text-sm font-medium">{t('common.email')}</label>
+                  <label className="text-white text-sm font-medium">Correo electrónico</label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
-                    <input className="form-input w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-border bg-background-dark/50 focus:border-primary h-14 pl-12 pr-4 placeholder:text-slate-500 text-base font-normal transition-all" placeholder={t('common.email_placeholder')} type="email" value=""/>
+                    <input className="form-input w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-border bg-background-dark/50 focus:border-primary h-14 pl-12 pr-4 placeholder:text-slate-500 text-base font-normal transition-all" placeholder="tu@email.com" type="email" value=""/>
                   </div>
                 </div>
                 
                 {/* Password Field */}
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-white text-sm font-medium">{t('common.password')}</label>
-                    <Link href="/forgot-password" className="text-xs text-primary hover:underline">{t('common.forgot_password')}</Link>
+                    <label className="text-white text-sm font-medium">Contraseña</label>
+                    <Link href="/forgot-password" className="text-xs text-primary hover:underline">¿Olvidaste tu contraseña?</Link>
                   </div>
                   <div className="relative flex items-center">
                     <span className="material-symbols-outlined absolute left-4 text-slate-400 text-xl">lock_open</span>
-                    <input className="form-input w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-border bg-background-dark/50 focus:border-primary h-14 pl-12 pr-12 placeholder:text-slate-500 text-base font-normal transition-all" placeholder={t('common.password_placeholder')} type="password" value=""/>
+                    <input className="form-input w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-border bg-background-dark/50 focus:border-primary h-14 pl-12 pr-12 placeholder:text-slate-500 text-base font-normal transition-all" placeholder="••••••••" type="password" value=""/>
                     <button className="absolute right-4 text-slate-400 hover:text-white transition-colors" type="button">
                       <span className="material-symbols-outlined">visibility</span>
                     </button>
@@ -78,7 +78,7 @@ export default function UnauthorizedPage() {
                 {/* Submit Button */}
                 <Link href="/login">
                   <Button className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 focus:ring-4 focus:ring-primary/30 transition-all flex items-center justify-center gap-2" type="submit">
-                    <span>{t('common.login')}</span>
+                    <span>Iniciar sesión</span>
                     <span className="material-symbols-outlined">login</span>
                   </Button>
                 </Link>
@@ -87,24 +87,24 @@ export default function UnauthorizedPage() {
               {/* Divider */}
               <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-border"></span></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="bg-background-dark px-2 text-slate-500">{t('common.or')}</span></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-background-dark px-2 text-slate-500">o</span></div>
               </div>
               
               {/* Secondary Actions */}
               <Link href="/">
                 <Button variant="outline" className="w-full h-12 border border-slate-border text-white text-sm font-medium rounded-lg hover:bg-white/5 transition-all flex items-center justify-center gap-2">
                   <span className="material-symbols-outlined">arrow_back</span>
-                  {t('common.go_home')}
+                  Ir al inicio
                 </Button>
               </Link>
             </div>
             
             {/* Footer Info */}
             <div className="flex flex-col items-center gap-4 py-4">
-              <p className="text-slate-500 text-xs">{t('common.copyright')}</p>
+              <p className="text-slate-500 text-xs">© 2024 VentasYa</p>
               <div className="flex gap-4">
-                <Link href="/terms" className="text-slate-500 hover:text-primary transition-colors text-xs underline">{t('footer.terms')}</Link>
-                <Link href="/privacy" className="text-slate-500 hover:text-primary transition-colors text-xs underline">{t('footer.privacy')}</Link>
+                <Link href="/terms" className="text-slate-500 hover:text-primary transition-colors text-xs underline">Términos</Link>
+                <Link href="/privacy" className="text-slate-500 hover:text-primary transition-colors text-xs underline">Privacidad</Link>
               </div>
             </div>
           </div>
@@ -126,11 +126,11 @@ export default function UnauthorizedPage() {
           <div className="size-24 rounded-2xl bg-slate-input border border-red-500/50 text-red-500 mx-auto flex items-center justify-center">
             <span className="material-symbols-outlined !text-5xl">gpp_maybe</span>
           </div>
-          <h1 className="text-white text-3xl font-bold">403 - {t('common.no_permissions')}</h1>
-          <p className="text-slate-400">{t('common.permission_denied')}</p>
+          <h1 className="text-white text-3xl font-bold">403 - Sin permisos</h1>
+          <p className="text-slate-400">Permiso denegado</p>
           <div className="flex flex-col gap-3">
-            <Button className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90">{t('common.request_access')}</Button>
-            <Button variant="outline" className="w-full h-14 border border-slate-border text-white font-bold rounded-lg hover:bg-white/5">{t('common.logout_other_account')}</Button>
+            <Button className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90">Solicitar acceso</Button>
+            <Button variant="outline" className="w-full h-14 border border-slate-border text-white font-bold rounded-lg hover:bg-white/5">Cerrar sesión de otra cuenta</Button>
           </div>
         </div>
       </div>

@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { Button } from '@/src/shared/ui/button';
-import { useI18n } from '@/src/hooks/use-i18n';
+// import { useI18n } from '@/src/shared/hooks/use-i18n';
 
 export default function ServerErrorPage() {
-  const { t } = useI18n();
+  // const { t } = useI18n(); // Desactivado para evitar error de contexto
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display">
@@ -21,8 +21,8 @@ export default function ServerErrorPage() {
           <h2 className="text-[#1b110d] dark:text-[#fcf9f8] text-xl font-bold leading-tight tracking-[-0.015em]">VentasYa</h2>
         </div>
         <nav className="flex gap-6">
-          <Link href="/status" className="text-sm font-medium text-[#9a614c] dark:text-[#c4a498] hover:text-primary transition-colors">{t('common.system_status')}</Link>
-          <Link href="/support" className="text-sm font-medium text-[#9a614c] dark:text-[#c4a498] hover:text-primary transition-colors">{t('common.support')}</Link>
+          <Link href="/status" className="text-sm font-medium text-[#9a614c] dark:text-[#c4a498] hover:text-primary transition-colors">Estado del sistema</Link>
+          <Link href="/support" className="text-sm font-medium text-[#9a614c] dark:text-[#c4a498] hover:text-primary transition-colors">Soporte</Link>
         </nav>
       </header>
       <main className="flex-1 flex items-center justify-center p-6">
@@ -33,16 +33,16 @@ export default function ServerErrorPage() {
           </div>
           {/* HeadlineText */}
           <h1 className="text-[#1b110d] dark:text-[#fcf9f8] tracking-tight text-[32px] md:text-[40px] font-bold leading-tight px-4 text-center pb-4">
-            {t('common.technical_difficulties')}
+            Dificultades técnicas
           </h1>
           {/* BodyText */}
           <p className="text-[#1b110d] dark:text-[#e7d6cf] text-lg font-normal leading-relaxed pb-8 px-4 text-center max-w-[520px]">
-            {t('common.engineers_working')}
+            Nuestros ingenieros están trabajando para resolver el problema. Por favor, inténtalo de nuevo en unos momentos.
           </p>
           {/* SingleButton */}
           <div className="flex px-4 py-3 justify-center w-full">
             <Button className="flex min-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-8 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] hover:bg-[#d44310] transition-all shadow-lg shadow-primary/20" onClick={() => window.location.reload()}>
-              <span className="truncate">{t('common.refresh_page')}</span>
+              <span className="truncate">Recargar página</span>
             </Button>
           </div>
           {/* ActionPanel / Status Indicator */}
@@ -55,8 +55,8 @@ export default function ServerErrorPage() {
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-[#1b110d] dark:text-[#fcf9f8] text-sm font-bold leading-tight">{t('common.systems_maintenance')}</p>
-                    <p className="text-[#9a614c] dark:text-[#c4a498] text-xs font-normal leading-normal">{t('common.working_normal')}</p>
+                    <p className="text-[#1b110d] dark:text-[#fcf9f8] text-sm font-bold leading-tight">Mantenimiento de sistemas</p>
+                    <p className="text-[#9a614c] dark:text-[#c4a498] text-xs font-normal leading-normal">Trabajando para restaurar operaciones normales</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-[#9a614c] dark:text-[#c4a498]">construction</span>
@@ -67,7 +67,7 @@ export default function ServerErrorPage() {
           <div className="mt-8">
             <Link href="/" className="text-primary font-medium flex items-center gap-2 hover:underline">
               <span className="material-symbols-outlined text-sm">arrow_back</span>
-              {t('common.go_home')}
+              Ir al inicio
             </Link>
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function ServerErrorPage() {
       {/* Footer */}
       <footer className="py-8 px-10 text-center border-t border-[#e7d6cf] dark:border-[#3d2a23]">
         <p className="text-[#9a614c] dark:text-[#c4a498] text-sm">
-          {t('common.error_code_500')} • © 2024 VentasYa S.A.
+          Error 500 • © 2024 VentasYa S.A.
         </p>
       </footer>
     </div>

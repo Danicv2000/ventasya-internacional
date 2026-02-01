@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Settings, Save, RotateCcw } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Card } from "@/src/shared/ui/card"
+import { Badge } from "@/src/shared/ui/badge"
+import { Label } from "@/src/shared/ui/label"
+import { Input } from "@/src/shared/ui/input"
+import { Button } from "@/src/shared/ui/button"
+
 
 interface CalculationConfig {
   exchangeRate: number

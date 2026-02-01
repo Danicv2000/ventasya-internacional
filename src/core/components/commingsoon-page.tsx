@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/src/shared/ui/button';
-import { useI18n } from '@/src/hooks/use-i18n';
+import { useI18n } from '@/src/shared/hooks/use-i18n';
 
 export default function ComingSoonPage() {
   const { t } = useI18n();

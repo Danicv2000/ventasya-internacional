@@ -1,7 +1,7 @@
-import { OrderForm } from "@/components/order-form"
+import { OrderForm } from "@/src/features/orders/order-form"
 import { Package } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/src/shared/ui/button"
 
 export default function OrderPage() {
   return (

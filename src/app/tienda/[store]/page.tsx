@@ -1,4 +1,5 @@
-import { MarketplaceView } from "@/components/marketplace-view";
+import { MarketplaceView } from "@/src/features/stores/marketplace-view";
+
 
 export default function StoreMarketplacePage({ params }: { params: { store?: string } }) {
   console.log('Store parameter:', params?.store);

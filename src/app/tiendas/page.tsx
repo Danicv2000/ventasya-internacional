@@ -13,7 +13,7 @@ import {
   Heart
 } from "lucide-react";
 import { TemuIcon, SheinIcon, AmazonIcon } from "@/src/features/common/platform-icons";
-import { useI18n } from "@/src/hooks/use-i18n";
+import { useI18n } from "@/src/shared/hooks/use-i18n";
 
 export default function StoreSelectionPage() {
   const { t } = useI18n();

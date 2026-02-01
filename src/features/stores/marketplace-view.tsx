@@ -2,11 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Search, 
   Star, 
@@ -19,9 +14,42 @@ import {
   Truck,
   Sparkles
 } from "lucide-react";
-import { TemuIcon, SheinIcon, AmazonIcon } from "@/components/platform-icons";
-import { productScraper, type Product, type SearchFilters } from "@/src/lib/product-scraper";
-import { AIScrapingInterface } from "@/components/ai-scraping-interface";
+import { AmazonIcon, SheinIcon, TemuIcon } from '../common/platform-icons';
+import { Button } from '@/src/shared/ui/button';
+import { Input } from '@/src/shared/ui/input';
+import { Card, CardContent, CardFooter, CardHeader } from '@/src/shared/ui/card';
+import { Badge } from '@/src/shared/ui/badge';
+import { Skeleton } from '@/src/shared/ui/skeleton';
+
+
+// Define types locally since we removed the scraper
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  currency: string;
+  imageUrl: string;
+  rating: number;
+  reviewCount: number;
+  description: string;
+  category: string;
+  brand: string;
+  availability: 'in_stock' | 'limited' | 'out_of_stock';
+  shippingInfo: string;
+  discount?: number;
+  url: string;
+  store: 'temu' | 'shein' | 'amazon';
+}
+
+interface SearchFilters {
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  brand?: string;
+  rating?: number;
+  sortBy?: 'price_low' | 'price_high' | 'rating' | 'popularity';
+}
 
 interface MarketplaceViewProps {
   store: 'temu' | 'shein' | 'amazon';
@@ -39,8 +67,7 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
   const [filters, setFilters] = useState<SearchFilters>({
     sortBy: 'popularity'
   });
-  const [showAIScraper, setShowAIScraper] = useState(false);
-  const [aiScrapedProduct, setAiScrapedProduct] = useState<any>(null);
+
 
   // Get store display info
   const storeInfo = {
@@ -73,20 +100,31 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      try {
-        // Load trending products
-        const trendingProducts = await productScraper.getTrendingProducts(store);
-        setProducts(trendingProducts);
-        setFilteredProducts(trendingProducts);
-        
-        // Load categories
-        const cats = await productScraper.getCategories(store);
-        setCategories(cats);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setLoading(false);
-      }
+      // Mock data since we removed the scraper
+      const mockProducts: Product[] = [
+        {
+          id: 'mock_1',
+          name: 'Producto de ejemplo',
+          price: 29.99,
+          currency: 'USD',
+          imageUrl: 'https://placehold.co/400x400',
+          rating: 4.5,
+          reviewCount: 120,
+          description: 'Descripción del producto de ejemplo',
+          category: 'Electrónica',
+          brand: 'Marca Ejemplo',
+          availability: 'in_stock',
+          shippingInfo: 'Envío gratis',
+          url: '#',
+          store: store
+        }
+      ];
+      
+      setProducts(mockProducts);
+      setFilteredProducts(mockProducts);
+      setCategories(['Electrónica', 'Ropa', 'Hogar']);
+      
+      setLoading(false);
     };
 
     loadData();
@@ -134,16 +172,32 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
     if (!searchQuery.trim()) return;
     
     setSearchLoading(true);
-    try {
-      const results = await productScraper.searchProducts(searchQuery, store, filters);
-      setProducts(results);
-      setFilteredProducts(results);
-      setSelectedCategory(null); // Clear category filter when searching
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
+    // Mock search functionality
+    setSearchLoading(true);
+    setTimeout(() => {
+      const mockResults: Product[] = [
+        {
+          id: `search_${Date.now()}`,
+          name: `Resultados para: ${searchQuery}`,
+          price: 39.99,
+          currency: 'USD',
+          imageUrl: 'https://placehold.co/400x400',
+          rating: 4.2,
+          reviewCount: 85,
+          description: `Productos relacionados con: ${searchQuery}`,
+          category: 'General',
+          brand: 'Búsqueda',
+          availability: 'in_stock',
+          shippingInfo: 'Envío estándar',
+          url: '#',
+          store: store
+        }
+      ];
+      setProducts(mockResults);
+      setFilteredProducts(mockResults);
+      setSelectedCategory(null);
       setSearchLoading(false);
-    }
+    }, 800);
   };
 
   const handleProductSelect = (product: Product) => {
@@ -164,25 +218,7 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
     router.push('/pedido');
   };
 
-  const handleAIScrapedProduct = (productData: any) => {
-    // Convert AI-scraped data to our format
-    const convertedData = {
-      productName: productData.name,
-      productUrl: productData.url || '', // The URL that was scraped
-      productPriceUSD: productData.price.replace(/[^\d.]/g, ''), // Extract numeric price
-      storeName: 'Sitio Web Personalizado',
-      imageUrl: productData.imageUrl || '',
-      description: productData.description || productData.name
-    };
-    
-    setAiScrapedProduct(convertedData);
-    
-    // Store in session storage
-    sessionStorage.setItem('selectedProduct', JSON.stringify(convertedData));
-    
-    // Navigate to order page
-    router.push('/pedido');
-  };
+
 
   const formatPrice = (price: number, originalPrice?: number) => {
     if (originalPrice && originalPrice > price) {
@@ -294,8 +330,8 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
                 type="text"
                 placeholder={`Buscar productos en ${currentStore.name}...`}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch()}
                 className="pl-10 pr-20 py-3 text-lg border-2 border-gray-200 focus:border-primary transition-colors"
               />
               <Button 
@@ -311,23 +347,10 @@ export function MarketplaceView({ store }: MarketplaceViewProps) {
               </Button>
             </div>
             
-            {/* AI Scraper Toggle */}
-            <Button 
-              variant={showAIScraper ? "default" : "outline"}
-              onClick={() => setShowAIScraper(!showAIScraper)}
-              className="flex items-center gap-2 border-2"
-            >
-              <Sparkles className="h-5 w-5" />
-              {showAIScraper ? "Cerrar Buscador AI" : "Usar Buscador AI"}
-            </Button>
+
           </div>
           
-          {/* AI Scraping Interface */}
-          {showAIScraper && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border-2 border-purple-200">
-              <AIScrapingInterface onProductScraped={handleAIScrapedProduct} />
-            </div>
-          )}
+
           
           {/* Filters */}
           <div>

@@ -21,7 +21,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { amazonProductService, type AmazonProduct, type SearchFilters } from '@/src/lib/amazon-product-service';
-import { productScraper, type Product as MockProduct } from '@/src/lib/product-scraper';
+// Removed productScraper import - using amazonProductService instead
 
 interface AmazonSearchInterfaceProps {
   initialSearch?: string;

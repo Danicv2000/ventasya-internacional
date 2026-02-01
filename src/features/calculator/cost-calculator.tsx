@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calculator, RotateCcw, Sparkles } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
+import { Card } from "@/src/shared/ui/card"
+import { Label } from "@/src/shared/ui/label"
+import { Input } from "@/src/shared/ui/input"
+import { Switch } from "@/src/shared/ui/switch"
+import { Button } from "@/src/shared/ui/button"
+import { Badge } from "@/src/shared/ui/badge"
+
 
 interface CalculationResult {
   productPriceUSD: number

@@ -19,8 +19,7 @@ import {
   ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
-import { useI18n } from "@/src/hooks/use-i18n";
-import { useReadSecrets } from "@/src/hooks/use-exchange-rate";
+import { useI18n } from "@/src/shared/hooks/use-i18n";
 import { Logo } from "./icons/Logo";
 import { PeopleGroup } from "./icons/PeopleGroup";
 
@@ -30,8 +29,6 @@ export default function LandingPage() {
   const [itemValue, setItemValue] = useState("");
   const [selectedStore, setSelectedStore] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash-usd");
-
-  useReadSecrets();
 
   const calculateTotal = () => {
     const price = parseFloat(itemValue) || 0;

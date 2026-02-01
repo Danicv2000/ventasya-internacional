@@ -1,7 +1,6 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card } from "@/src/shared/ui/card"
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, DollarSign, Target } from "lucide-react"
 
 interface ProfitabilityAdvisorProps {

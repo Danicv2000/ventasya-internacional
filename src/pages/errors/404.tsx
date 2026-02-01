@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { Button } from '@/src/shared/ui/button';
-import { useI18n } from '@/src/hooks/use-i18n';
+// import { useI18n } from '@/src/shared/hooks/use-i18n';
 
 export default function NotFoundPage() {
-  const { t } = useI18n();
+  // const { t } = useI18n(); // Desactivado para evitar error de contexto
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-[#0d141c] dark:text-slate-200 min-h-screen flex flex-col overflow-x-hidden">
@@ -56,9 +56,9 @@ export default function NotFoundPage() {
             {/* Text Content */}
             <div className="flex max-w-[540px] flex-col items-center gap-4 text-center">
               <h1 className="text-primary text-5xl font-extrabold tracking-tight">404</h1>
-              <h2 className="text-[#0d141c] dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">{t('common.not_found')}</h2>
+              <h2 className="text-[#0d141c] dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">Página no encontrada</h2>
               <p className="text-[#4f7396] dark:text-slate-400 text-lg font-normal leading-relaxed">
-                {t('common.page_not_found')}
+                Lo sentimos, la página que buscas no existe.
               </p>
             </div>
             
@@ -67,14 +67,14 @@ export default function NotFoundPage() {
               <Link href="/">
                 <Button className="flex min-w-[240px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-8 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] transition-all hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95">
                   <span className="material-symbols-outlined mr-2">home</span>
-                  <span className="truncate">{t('common.go_home')}</span>
+                  <span className="truncate">Ir al inicio</span>
                 </Button>
               </Link>
               
               {/* MetaText Component styled as a secondary link */}
               <Link href="/soporte" className="group flex items-center gap-2 text-[#47739e] dark:text-primary text-base font-semibold leading-normal underline decoration-2 underline-offset-4 hover:text-primary transition-colors">
                 <span className="material-symbols-outlined text-xl">support_agent</span>
-                {t('common.contact_support')}
+Contactar soporte
               </Link>
             </div>
           </div>
@@ -85,12 +85,12 @@ export default function NotFoundPage() {
       <div className="px-6 md:px-10 bg-background-light dark:bg-background-dark">
         <footer className="flex flex-col gap-6 py-10 text-center border-t border-solid border-[#e6edf4] dark:border-slate-800">
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <Link href="/privacy" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">{t('footer.privacy')}</Link>
-            <Link href="/terms" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">{t('footer.terms')}</Link>
-            <Link href="/help" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">{t('footer.help')}</Link>
+            <Link href="/privacy" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">Privacidad</Link>
+            <Link href="/terms" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">Términos</Link>
+            <Link href="/help" className="text-[#47739e] dark:text-slate-400 text-base font-normal leading-normal hover:text-primary transition-colors">Ayuda</Link>
           </div>
           <p className="text-[#47739e] dark:text-slate-500 text-sm font-normal leading-normal">
-            © 2024 VentasYa. {t('common.all_rights_reserved')}.
+            © 2024 VentasYa. Todos los derechos reservados.
           </p>
         </footer>
       </div>

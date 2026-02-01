@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+
 import { useShipping } from "@/src/core/contexts/shipping-context"
 import { Package, Plus, Trash2, Users, Search } from "lucide-react"
+import { Card } from "@/src/shared/ui/card"
+import { Button } from "@/src/shared/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/ui/select"
+import { Badge } from "@/src/shared/ui/badge"
 
 // Mock data - En producción vendría de la API
 const existingOrders = [

@@ -2,6 +2,15 @@
 
 import { Card } from "@/src/shared/ui/card"
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, DollarSign, Target } from "lucide-react"
+import { LucideIcon } from 'lucide-react';
+
+interface Recommendation {
+  type: string;
+  icon: LucideIcon;
+  title: string;
+  message: string;
+  action: string;
+}
 
 interface ProfitabilityAdvisorProps {
   productPriceUSD: number
@@ -22,8 +31,8 @@ export function ProfitabilityAdvisor({
   const profitUSD = totalProfitCUP / exchangeRate
   const profitPercentageOfTotal = (profitUSD / totalCostUSD) * 100
   
-  const getRecommendations = () => {
-    const recommendations = []
+  const getRecommendations = (): Recommendation[] => {
+    const recommendations: Recommendation[] = []
     
     // Análisis de rentabilidad
     if (profitPercentageOfTotal < 15) {
@@ -88,7 +97,7 @@ export function ProfitabilityAdvisor({
   
   const recommendations = getRecommendations()
   
-  const getStatusColor = (type: string) => {
+  const getStatusColor = (type: string): string => {
     switch (type) {
       case "success": return "bg-green-100 border-green-300 text-green-800"
       case "good": return "bg-blue-100 border-blue-300 text-blue-800"

@@ -1,17 +1,18 @@
-# 🎉 Documentación de Despliegue Completa
+# 🎉 Documentación de Despliegue y Arquitectura Modular Completa
 
 ## 📁 Archivos creados
 
 ```
 docs/
-├── README.md           # Índice principal de documentación
-├── DEPLOYMENT-GUIDE.md # Guía completa de despliegue
-├── QUICK-START.md      # Guía rápida de 5 minutos
-├── SECURITY-GUIDE.md   # Seguridad de variables de entorno
-└── FAQ.md              # Preguntas frecuentes
+├── README.md              # Índice principal de documentación
+├── ARQUITECTURA_MODULAR.md # Documentación de la nueva arquitectura
+├── DEPLOYMENT-GUIDE.md    # Guía completa de despliegue
+├── QUICK-START.md         # Guía rápida de 5 minutos
+├── SECURITY-GUIDE.md      # Seguridad de variables de entorno
+└── FAQ.md                 # Preguntas frecuentes
 
 Otros archivos:
-├── .env.example        # Plantilla de variables de entorno
+├── .env.example           # Plantilla de variables de entorno
 └── .github/workflows/main.yml (actualizado)
 ```
 

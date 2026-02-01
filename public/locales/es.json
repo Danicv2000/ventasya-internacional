@@ -1,0 +1,185 @@
+{
+  "common": {
+    "welcome": "Bienvenido a EncargosYa",
+    "home": "Inicio",
+    "stores": "Tiendas",
+    "calculator": "Calculadora",
+    "orders": "Pedidos",
+    "tracking": "Seguimiento",
+    "support": "Soporte",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "back": "Volver",
+    "continue": "Continuar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "search": "Buscar",
+    "settings": "Configuración", 
+    "transparency": "Transparencia Total",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "blog": "Blog",
+    "terms": "Términos de Servicio",
+    "privacy": "Privacidad",
+    "cookies": "Cookies",
+    "returns": "Devoluciones",
+    "shipping": "Envío",
+    "payment": "Pago",
+    "faq": "Preguntas Frecuentes",
+    "security": "Pagos Seguros",
+    "help": "Ayuda",
+    "ready_to_buy": "¿Listo para traer tus compras a casa?",
+    "create_account": "Crear Cuenta Gratis",
+    "talk_to_agent": "Hablar con un Agente",
+    "all_rights_reserved": "Todos los derechos reservados"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "calculator": "Calculadora de Envíos",
+    "stores": "Tiendas",
+    "orders": "Mis Pedidos",
+    "admin": "Panel Admin"
+  },
+  "hero": {
+    "head": "Logística Directa a Cuba",
+    "title": "Sin trabas, sin complicaciones, solo tus compras.",
+    "title_section_1": "Sin trabas, sin complicaciones,",
+    "title_section_2": "solo tus compras.",
+    "description": "Únete a más de 15,000 usuarios que confían en nosotros para sus envíos mensuales a Cuba.",
+    "subtitle": "Compra en tus tiendas favoritas de USA y el mundo. Nosotros nos encargamos de la aduana, el transporte y la entrega en la puerta de tu casa en Cuba.",
+    "cta": "Comenzar a Comprar"
+  },
+  "calculator": {
+    "title": "Calculadora de Envío",
+    "store": "Tienda de Origen",
+    "weight": "Peso del Paquete (lbs)",
+    "value": "Valor de los Artículos (USD)",
+    "estimated": "Total Estimado",
+    "includes": "Incluye envío, aranceles y manejo",
+    "delivery_time": "Entrega estimada: 30-45 días hábiles.",
+    "warning":{
+      "section_1": "Estimado a ",
+      "section_2": ". Si el producto pesa más, el precio final aumentará."
+    }
+  },
+  "stores": {
+    "title": "Enviamos desde tus tiendas favoritas",
+    "description": "Navega por las mejores tiendas internacionales como si estuvieras comprando directamente en ellas. Encuentra lo que buscas y déjanos traerlo para ti.",
+    "explore": "Explorar {store}",
+    "temu": {
+      "name": "TEMU",
+      "description": "Miles de productos con precios increíbles y envío rápido",
+      "features": [
+        "Precios hasta 90% más bajos",
+        "Envío rápido",
+        "Productos de calidad garantizada"
+      ]
+    },
+    "shein": {
+      "name": "SHEIN",
+      "description": "Moda moderna y accesorios con las últimas tendencias",
+      "features": [
+        "Últimas tendencias de moda",
+        "Nueva mercancía semanal",
+        "Tallas para todas las figuras"
+      ]
+    },
+    "amazon": {
+      "name": "AMAZON",
+      "description": "La mayor selección de productos de todas las categorías",
+      "features": [
+        "Millones de productos disponibles",
+        "Envío Prime rápido",
+        "Garantía de satisfacción"
+      ]
+    }
+  },
+  "tracking": {
+    "title": "Tu carga protegida y monitoreada",
+    "title_real_time": "Seguimiento en Tiempo Real de Tu Carga",
+    "subtitle_real_time": "Seguimiento en Tiempo Real",
+    "description": "No más incertidumbre. Con nuestro sistema de rastreo satelital avanzado, sabrás exactamente dónde está tu paquete, desde que sale del almacén en Miami hasta que llega a su destino en cualquier provincia de Cuba.",
+    "description_real_time": "Nuestro sistema de seguimiento GPS te permite conocer la ubicacion exacta de tu paquete en todo momento, desde que sale de la tienda hasta que llega a tu hogar.",
+    "status": "Estado",
+    "location": "Ubicación",
+    "transit": "En Tránsito",
+    "delivered": "Entregado",
+    "in_transit": "En Tránsito",
+    "pending": "Pendiente",
+    "24_7": "24/7"
+  },
+  "process_steps": {
+    "title": "¿Cómo funciona VentasYa?",
+    "subtitle": "Nuestro proceso está diseñado para ser tan simple como comprar en la esquina.",
+    "step_1": {
+      "nro": "1",
+      "title": "Elige tu tienda favorita",
+      "description": "Navega por las mejores tiendas internacionales como si estuvieras comprando directamente en ellas. "
+    },
+    "step_2": {
+      "nro": "2",
+      "title": "Selecciona tus productos",
+      "description": "Selecciona los productos de tu preferencia y que se ajisten a tus necesidades."
+    },
+    "step_3": {
+      "nro": "3",
+      "title": "Realiza tu pedido",
+      "description": "Déjanos traerlo para ti a travez de nuestros agentes encargados de atenderte y asistirte en todo el proceso."
+    },
+    "step_4": {
+      "nro": "4",
+      "title": "Consolidamos tus pedidos",
+      "description": "Agrupamos y enviamos tus pedidos para que ahorres en el envío."
+    },
+    "step_5": {
+      "nro": "5",
+      "title": "Recibe en Cuba",
+      "description": "Recibe tu pedido en Cuba a través de nuestros agentes con seguridad garantizada."
+    }
+  },
+  "footer": {
+    "title": "EncargosYa",
+    "subtitle": "Tu puente logístico de confianza entre el mundo y Cuba. Transparencia en cada gramo.", 
+    "services": {
+      "title": "Servicios",
+      "sea_shipping": "Envíos Marítimos",
+      "aerial_shipping": "Envíos Aéreos",
+      "assisted_purchase": "Compra Asistida"
+    },
+    "resources": {
+      "title": "Recursos",
+      "faq": "Preguntas Frecuentes",
+      "blog": "Blog de Aduana",
+      "calculator": "Calculadora de Envío",
+      "terms": "Términos de Uso"
+    },
+    "contact":{
+      "title": "Contacto",
+      "description": "Nuestro equipo de soporte está aquí para ayudarte. No dudes en contactarnos si tienes alguna pregunta o necesitas asistencia.",
+      "mail": "Correo Electrónico",
+      "call": "Llamar",
+      "location": "Ubicacion",
+      "form": {
+        "name": "Nombre",
+        "email": "Correo Electrónico",
+        "message": "Mensaje",
+        "submit": "Enviar"
+      }
+    },
+    "about": "Acerca de",
+    "blog": "Blog",
+    "careers": "Carreras",
+    "press": "Prensa",
+    "help_center": "Centro de Ayuda",
+    "terms": "Términos de Servicio",
+    "privacy": "Privacidad",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "youtube": "YouTube"
+  }
+}

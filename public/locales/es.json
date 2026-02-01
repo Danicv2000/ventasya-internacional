@@ -35,7 +35,24 @@
     "ready_to_buy": "¿Listo para traer tus compras a casa?",
     "create_account": "Crear Cuenta Gratis",
     "talk_to_agent": "Hablar con un Agente",
-    "all_rights_reserved": "Todos los derechos reservados"
+    "all_rights_reserved": "Todos los derechos reservados",
+    "email_placeholder": "Tu correo electrónico",
+    "notify_me": "Notificarme",
+    "be_first_to_know": "Sé el primero en saberlo",
+    "launch": "Lanzamiento",
+    "very_soon": "Muy Pronto",
+    "shippings": "Envíos",
+    "globals": "Globales",
+    "100_guaranteed": "100% Garantizado",
+    "coming_soon": {
+      "year_text": "Próximamente en",
+      "title":{
+        "section_1": "Algo grande está llegando",
+        "section_2": "a tus manos"
+      },
+      "description": "Estamos afinando los últimos detalles para que compres en el mundo desde Cuba como nunca antes.",
+      "security": "Seguridad"
+    }
   },
   "navigation": {
     "home": "Inicio",
@@ -180,6 +197,7 @@
     "instagram": "Instagram",
     "facebook": "Facebook",
     "twitter": "Twitter",
-    "youtube": "YouTube"
+    "youtube": "YouTube", 
+    "support": "Soporte"
   }
 }

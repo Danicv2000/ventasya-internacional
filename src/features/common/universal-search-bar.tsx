@@ -68,8 +68,21 @@ export function UniversalSearchBar({
   };
 
   const handleProductClick = (product: any) => {
-    // Navigate to the product detail page
-    router.push(`/tienda/amazon/${product.asin}`);
+    // Navigate to order creation with product data
+    const productData = {
+      productName: product.name,
+      productUrl: product.url,
+      productPriceUSD: product.price.toString(),
+      storeName: 'Amazon',
+      imageUrl: product.imageUrl,
+      description: product.description
+    };
+    
+    // Store in session storage
+    sessionStorage.setItem('selectedProduct', JSON.stringify(productData));
+    
+    // Navigate to order page
+    router.push('/pedido');
     setShowDropdown(false);
   };
 

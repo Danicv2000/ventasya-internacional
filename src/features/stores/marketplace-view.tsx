@@ -20,7 +20,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { TemuIcon, SheinIcon, AmazonIcon } from "@/components/platform-icons";
-import { productScraper, type Product, type SearchFilters } from "@/lib/product-scraper";
+import { productScraper, type Product, type SearchFilters } from "@/src/lib/product-scraper";
 import { AIScrapingInterface } from "@/components/ai-scraping-interface";
 
 interface MarketplaceViewProps {

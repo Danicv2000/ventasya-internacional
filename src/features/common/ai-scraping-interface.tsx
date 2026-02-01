@@ -14,7 +14,7 @@ import {
   AlertCircle,
   ExternalLink
 } from "lucide-react";
-import type { ProductData } from "@/lib/ai-web-scraper";
+import type { ProductData } from "@/src/lib/ai-web-scraper";
 
 interface AIScrapingInterfaceProps {
   onProductScraped?: (product: ProductData) => void;

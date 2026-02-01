@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { aiScraper } from '@/lib/ai-web-scraper';
+import { aiScraper } from '@/src/lib/ai-web-scraper';
 
 export async function POST(request: Request) {
   try {

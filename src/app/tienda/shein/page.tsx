@@ -1,7 +1,8 @@
 'use client';
 
+import { MarketplaceView } from '@/src/features/stores/marketplace-view';
 import { useRouter } from 'next/navigation';
-import { MarketplaceView } from "@/components/marketplace-view";
+
 
 export default function SheinMarketplacePage() {
   const router = useRouter();

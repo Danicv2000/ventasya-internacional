@@ -20,8 +20,8 @@ import {
   AlertTriangle,
   ExternalLink
 } from 'lucide-react';
-import { amazonProductService, type AmazonProduct, type SearchFilters } from '@/lib/amazon-product-service';
-import { productScraper, type Product as MockProduct } from '@/lib/product-scraper';
+import { amazonProductService, type AmazonProduct, type SearchFilters } from '@/src/lib/amazon-product-service';
+import { productScraper, type Product as MockProduct } from '@/src/lib/product-scraper';
 
 interface AmazonSearchInterfaceProps {
   initialSearch?: string;

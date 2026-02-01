@@ -13,11 +13,11 @@ import {
   RotateCcw,
   ExternalLink
 } from 'lucide-react';
-import { amazonProductService, type AmazonProduct } from '@/lib/amazon-product-service';
+import { amazonProductService, type AmazonProduct } from '@/src/lib/amazon-product-service';
 
 export default function AmazonProductDetailPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string | undefined;
   const [product, setProduct] = useState<AmazonProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -42,10 +42,10 @@ export default function AmazonProductDetailPage() {
       }
     };
 
-    if (id) {
+    if (id && params !== null) {
       fetchProduct();
     }
-  }, [id]);
+  }, [id, params]);
 
   const handleAddToCart = () => {
     if (!product) return;

@@ -10,7 +10,7 @@ import { OrderDetailModal } from "@/src/features/orders/order-detail-modal"
 import { CreateOrderModal } from "@/src/features/orders/create-order-modal"
 import { CalculationSettings } from "@/src/features/calculator/calculation-settings"
 import { ConsolidatedShipping } from "@/src/features/tracking/consolidated-shipping"
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/src/core/contexts/auth-context"
 import Link from "next/link"
 
 // Mock data - In production this would come from API

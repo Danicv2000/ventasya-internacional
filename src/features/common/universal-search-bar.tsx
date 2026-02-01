@@ -6,7 +6,7 @@ import { Input } from '@/src/shared/ui/input';
 import { Button } from '@/src/shared/ui/button';
 import { Card } from '@/src/shared/ui/card';
 import { Search, ShoppingCart, Bike, Monitor, Shirt, Gamepad2 } from 'lucide-react';
-import { amazonProductService } from '@/lib/amazon-product-service';
+import { amazonProductService } from '@/src/lib/amazon-product-service';
 
 interface UniversalSearchBarProps {
   placeholder?: string;

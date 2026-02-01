@@ -1,6 +1,7 @@
 'use client';
 
-import { AmazonSearchInterface } from "@/components/amazon-search-interface";
+import { AmazonSearchInterface } from "@/src/features/stores/amazon-search-interface";
+
 
 export default function AmazonMarketplacePage() {
   return (

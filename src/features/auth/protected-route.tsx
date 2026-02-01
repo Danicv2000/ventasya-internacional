@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/src/core/contexts/auth-context"
 import { AdminLogin } from "@/components/admin-login"
 
 interface ProtectedRouteProps {

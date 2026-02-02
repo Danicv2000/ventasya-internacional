@@ -736,7 +736,7 @@ export default function LandingPage() {
 
         <div className="max-w-[1280px] mx-auto mt-12 pt-8 border-t border-[#e6ebf4] dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-custom">
-            © 2024 VentasYa. {t("common.all_rights_reserved")}.
+            © {new Date().getFullYear()} VentasYa. {t("common.all_rights_reserved")}.
           </p>
           <div className="flex items-center gap-6 text-xs text-slate-custom">
             <a className="hover:text-primary" href="#">

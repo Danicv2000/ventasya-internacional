@@ -144,7 +144,9 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 // Load translations from JSON files
 const loadTranslationFile = async (locale: Language): Promise<TranslationKeys> => {
   try {
-    const response = await fetch(`/locales/${locale}.json`);
+    // Use NEXT_PUBLIC_BASE_PATH for GitHub Pages deployments
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const response = await fetch(`${basePath}/locales/${locale}.json`);
     if (!response.ok) {
       throw new Error(`Failed to load translations for ${locale}`);
     }

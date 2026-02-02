@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //basePath: '/ventasya-internacional',
+
+
+  basePath: process.env.ENVIROMENT == "prod" ? '/ventasya-internacional/' : '',
   //assetPrefix: '/ventasya-internacional/',
   //trailingSlash: true,
   typescript: {

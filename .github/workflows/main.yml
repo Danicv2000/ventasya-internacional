@@ -3,7 +3,7 @@ name: Deploy Next.js to GitHub Pages
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Permite ejecutar manualmente
+  workflow_dispatch: # Allows manual execution
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Clean Install (Fixing corrupted package.json)
+      - name: Clean Install
         run: |
           echo "Node version:"
           node -v
@@ -36,10 +36,9 @@ jobs:
           echo "Installing dependencies..."
           npm install
 
-      # NUEVO PASO: Parchear tsconfig.json para ignorar errores de tipos faltantes
+      # Patch TypeScript Config for build compatibility
       - name: Patch TypeScript Config
         run: |
-          # Desactivamos el modo estricto temporalmente para permitir el build
           if [ -f tsconfig.json ]; then
              sed -i 's/"strict": true/"strict": false/' tsconfig.json
              sed -i 's/"noImplicitAny": true/"noImplicitAny": false/' tsconfig.json
@@ -48,34 +47,30 @@ jobs:
 
       - name: Create .env.local with secrets
         run: |
-          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > .env.local
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
-          echo ".env.local created with secrets"
+          echo "Creating environment variables..."
+          echo "GITHUB_PAGES=true" >> .env.local
+          echo "NEXT_PUBLIC_BASE_PATH=/ventasya-internacional" >> .env.local
+          echo "NEXT_PUBLIC_VERCEL_ENV=preview" >> .env.local
+          echo "NEXT_PUBLIC_ANALYTICS_DISABLED=true" >> .env.local
+          if [ "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" != "" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env.local
+          fi
+          if [ "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" != "" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+          fi
+          echo ".env.local created with configuration"
           cat .env.local
-
-      - name: Create temporary next.config.js for static export
-        run: |
-          REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)
-          cat <<EOF > next.config.js
-          /** @type {import('next').NextConfig} */
-          const nextConfig = {
-            output: 'export',
-            distDir: 'out',
-            basePath: '/$REPO_NAME',
-            assetPrefix: '/$REPO_NAME',
-            trailingSlash: true,
-            images: {
-              unoptimized: true,
-            },
-          }
-          module.exports = nextConfig
-          EOF
 
       - name: Build Static Export
         run: npm run build
         
       - name: List 'out' directory (for debugging)
-        run: ls -la out/
+        run: |
+          echo "=== Contents of out directory ==="
+          ls -la out/
+          echo ""
+          echo "=== Checking if locales exist ==="
+          ls -la out/locales/ || echo "Locales directory not found"
         
       - name: Prepare deployment files
         run: |
@@ -89,7 +84,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ./deploy-files
 
   deploy:
     environment:

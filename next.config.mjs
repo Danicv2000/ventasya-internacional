@@ -3,7 +3,7 @@ const nextConfig = {
 
 
   basePath: process.env.ENVIROMENT == "prod" ? '/ventasya-internacional/' : '',
-  //assetPrefix: '/ventasya-internacional/',
+  assetPrefix: process.env.ENVIROMENT == "prod" ? '/ventasya-internacional/' : '',
   //trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,

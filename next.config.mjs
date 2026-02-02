@@ -6,6 +6,7 @@ const nextConfig = {
   basePath: process.env.GITHUB_PAGES ? '/ventasya-internacional' : '',
   assetPrefix: process.env.GITHUB_PAGES ? '/ventasya-internacional/' : '',
   trailingSlash: process.env.GITHUB_PAGES ? true : false,
+
   typescript: {
     ignoreBuildErrors: true,
   },

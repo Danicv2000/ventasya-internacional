@@ -37,16 +37,35 @@ export default function LandingPage() {
     // Paso 1: Precio base (Precio del producto * 1.5 si price es menor a 15 sino producto * 2.0)
     const baseCost = price <= 15 ? price * 2.0 : price * 1.5;
 
-    // Paso 2: Lógica del 20% solo para transferencias
+    /*
+     * Paso 2: Lógica del 20% solo para transferencias y tasa de cambio para pagos en CUP
+     *
+     * - Evalua si el metodo de pago seleccionado es en cup sino devuelve el el precio base
+     * - Evalua si el metodo de pago es transferencia por cup y aplica la formula:
+     *    precio base * tasa de conversion + 20% 
+     * - Si es pago en cup aplica la formula:
+     *    precio base * tasa de conversion
+     */
     let fee = 0;
-    if (paymentMethod === "transfer-cup") {
-      fee = price * 490 * 0.2;
-    } else if (paymentMethod === "cash-cup") {
-      fee = price * 490;
+    let total = 0;
+    const packageWeightCost = packageWeight * 10;
+
+    if (paymentMethod.includes("cup")) {
+      let cost = (baseCost + packageWeight) * 490;
+      if (paymentMethod === "transfer-cup") {
+        fee =  baseCost * 490 * 0.2;
+      } else if (paymentMethod === "cash-cup") {
+        fee = 0;
+      }
+      total = cost + fee;
+    } else {
+      total = baseCost + packageWeightCost;
     }
 
-    // Paso 3: Sumar Base + Fee (si aplica)
-    const total = baseCost + fee + packageWeight;
+    // console.log("price: " + price)
+    // console.log("baseCost: " + baseCost)
+    // console.log("fee: " + fee)
+    // console.log("total: " + total)
 
     return total.toFixed(2);
   };
@@ -621,7 +640,7 @@ export default function LandingPage() {
                 <PeopleGroup />
               </span>
               <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
-                
+
               </span>
             </div>
           </div>

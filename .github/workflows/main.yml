@@ -63,7 +63,7 @@ jobs:
           const nextConfig = {
             output: 'export',
             distDir: 'out',
-            basePath: '/$REPO_NAME',
+            basePath: '/$REPO_NAME/ventasya-internacional',
             assetPrefix: '/$REPO_NAME',
             trailingSlash: true,
             images: {

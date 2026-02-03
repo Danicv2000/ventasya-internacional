@@ -50,6 +50,8 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > .env.local
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+          echo "ENVIROMENT=${{ secrets.ENVIROMENT }}" >> .env.local
+          echo "NEXT_PUBLIC_BASE_PATH=${{ secrets.NEXT_PUBLIC_BASE_PATH }}" >> .env.local
           echo ".env.local created with secrets"
           cat .env.local
 

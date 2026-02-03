@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   basePath: process.env.ENVIROMENT === "prod" ? '/ventasya-internacional/' : '',
-  assetPrefix:'/ventasya-internacional/',
-  trailingSlash: true,
+  assetPrefix: process.env.ENVIROMENT === "prod" ? '/ventasya-internacional/' : '/ventasya-internacional/',
+  //trailingSlash: process.env.ENVIROMENT === "prod" ? true : false,
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true,

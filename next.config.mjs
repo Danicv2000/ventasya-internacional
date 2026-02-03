@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  output: 'export',
-  distDir: 'out',
-  basePath: process.env.GITHUB_PAGES ? '/ventasya-internacional' : '',
-  assetPrefix: process.env.GITHUB_PAGES ? '/ventasya-internacional/' : '',
-  trailingSlash: process.env.GITHUB_PAGES ? true : false,
+  //output: 'export',
+  //distDir: 'out',
+  basePath: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional' : '',
+  assetPrefix: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional/' : '',
+  trailingSlash: process.env.ENVIROMENTS === 'test' ? true : false,
 
   typescript: {
     ignoreBuildErrors: false,

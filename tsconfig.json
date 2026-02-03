@@ -51,8 +51,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-, "src/pages/_document.js"  ],
+    ".next/dev/types/**/*.ts",
+    "src/pages/_document.js",
+    "out/types/**/*.ts",
+    "out/dev/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

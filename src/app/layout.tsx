@@ -52,8 +52,7 @@ export default function RootLayout({
             </ShippingProvider>
           </AuthProvider>
         </I18nProvider>
-        {/* Disable Vercel Analytics for GitHub Pages to prevent 404 errors */}
-        {process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && process.env.NEXT_PUBLIC_ANALYTICS_DISABLED !== 'true' && <Analytics />}
+        <Analytics/>
       </body>
     </html>
   )

@@ -146,7 +146,12 @@ const loadTranslationFile = async (locale: Language): Promise<TranslationKeys> =
   try {
     // Use NEXT_PUBLIC_BASE_PATH for GitHub Pages deployments
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-    const response = await fetch(`${basePath}/locales/${locale}.json`);
+    let response = await fetch(`${basePath}/locales/${locale}.json`);
+
+    if(process.env.ENVIROMENT == 'test'){
+      response = await fetch(`${basePath}/locales/${locale}.json`)
+    } 
+
     if (!response.ok) {
       throw new Error(`Failed to load translations for ${locale}`);
     }

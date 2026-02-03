@@ -198,7 +198,7 @@ export default function ComingSoonPage() {
             </Link>
           </div>
           <p className="text-[#9e5e47] dark:text-[#fcf9f8]/40 text-sm font-medium">
-            © 2024 VentasYa. {t("common.all_rights_reserved")}.
+            © {new Date().getFullYear()} VentasYa. {t("common.all_rights_reserved")}.
           </p>
         </footer>
       </div>

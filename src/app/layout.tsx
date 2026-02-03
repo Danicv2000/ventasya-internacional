@@ -21,21 +21,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon-ligth.png",
+        url: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/icon-ligth.png`,
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark.png",
+        url: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/icon-dark.png`,
         media: "(prefers-color-scheme: dark)",
       },
       {
-        //url: "/icon.svg",
-        //type: "image/svg+xml",
-        url: "/icon-dark.svg",
+        url: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/icon-dark.png`,
         type: "image/png",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/apple-icon.png`,
   },
 }
 
@@ -54,7 +52,8 @@ export default function RootLayout({
             </ShippingProvider>
           </AuthProvider>
         </I18nProvider>
-        <Analytics />
+        {/* Disable Vercel Analytics for GitHub Pages to prevent 404 errors */}
+        {process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && process.env.NEXT_PUBLIC_ANALYTICS_DISABLED !== 'true' && <Analytics />}
       </body>
     </html>
   )

@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
-  basePath: process.env.ENVIROMENT === "prod" ? '/ventasya-internacional/' : '',
-  assetPrefix: process.env.ENVIROMENT === "prod" ? '/ventasya-internacional/' : '/ventasya-internacional/',
-  //trailingSlash: process.env.ENVIROMENT === "prod" ? true : false,
+  output: 'export',
+  distDir: 'out',
+  basePath: process.env.GITHUB_PAGES ? '/ventasya-internacional' : '',
+  assetPrefix: process.env.GITHUB_PAGES ? '/ventasya-internacional/' : '',
+  trailingSlash: process.env.GITHUB_PAGES ? true : false,
+
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -11,7 +15,10 @@ const nextConfig = {
   },
   // Use webpack instead of turbopack
   turbopack: {},
-  webpack: (config) => {
+  webpack: (config, { dev, isServer }) => {
+    if (!isServer) {
+      config.output.publicPath = 'auto';
+    }
     return config;
   },
 }

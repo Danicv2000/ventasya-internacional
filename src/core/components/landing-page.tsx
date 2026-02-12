@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import {
@@ -23,6 +23,7 @@ import { useI18n } from "@/src/shared/hooks/use-i18n";
 import { Logo } from "./icons/Logo";
 import { PeopleGroup } from "./icons/PeopleGroup";
 import { Mail } from "./icons/Mail";
+import { useTasasElToque } from "@/src/shared/hooks/use-elToque";
 
 export default function LandingPage() {
   const { t } = useI18n();
@@ -30,6 +31,22 @@ export default function LandingPage() {
   const [itemValue, setItemValue] = useState("");
   const [selectedStore, setSelectedStore] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash-usd");
+
+  // Hook para obtener las tasas de El Toque
+  const { data: tasasData, loading: tasasLoading, error: tasasError } = useTasasElToque({
+    dateFrom: `${new Date().toISOString().split('T')[0]} 00:00:01`,
+    dateTo: `${new Date().toISOString().split('T')[0]} 23:59:01`
+  });
+
+  // Mostrar la respuesta de El Toque en la consola
+  // useEffect(() => {
+  //   if (tasasData) {
+  //     console.log("Respuesta de El Toque API:", tasasData);
+  //   }
+  //   if (tasasError) {
+  //     console.error("Error de El Toque API:", tasasError);
+  //   }
+  // }, [tasasData, tasasError]);
 
   const calculateTotal = () => {
     const price = parseFloat(itemValue) || 0;
@@ -51,17 +68,25 @@ export default function LandingPage() {
     const packageWeightCost = packageWeight * 10;
 
     if (paymentMethod.includes("cup")) {
-      let cost = (baseCost + packageWeight) * 490;
+      let cost = (baseCost + packageWeightCost) *  tasasData?.tasas.USD
       if (paymentMethod === "transfer-cup") {
-        fee =  baseCost * 490 * 0.2;
+        fee =  cost * 0.2;
       } else if (paymentMethod === "cash-cup") {
         fee = 0;
       }
       total = cost + fee;
     } else {
-      total = baseCost + packageWeightCost;
+      if (paymentMethod === "cash-usd"){
+        total = baseCost + packageWeightCost;
+      }
+      else if (paymentMethod === "cash-euro"){
+        let dif = (baseCost + packageWeightCost) *  tasasData?.tasas.USD
+        total = (dif / tasasData?.tasas.ECU);
+      }
     }
 
+    // console.log("tasa USD: " + tasasData?.tasas.USD)
+    // console.log("tasa EURO: " + tasasData?.tasas.ECU)
     // console.log("price: " + price)
     // console.log("baseCost: " + baseCost)
     // console.log("fee: " + fee)
@@ -261,6 +286,14 @@ export default function LandingPage() {
                           </span>
                         </div>
                       </SelectItem>
+                      <SelectItem value="cash-euro">
+                        <div className="flex items-center gap-2">
+                          <span>Efectivo / EURO</span>
+                          <span className="text-xs text-green-600 font-normal">
+                            (Sin Fee)
+                          </span>
+                        </div>
+                      </SelectItem>
                       <SelectItem value="cash-cup">
                         <div className="flex items-center gap-2">
                           <span>Efectivo / CUP</span>
@@ -289,15 +322,18 @@ export default function LandingPage() {
                     </span>
                     <div
                       className="text-primary text-sm"
-                      title="Incluye impuestos y manejo"
+                      title="Tasa de El Toque del mercado informal"
                     >
                       ℹ
                     </div>
                   </div>
                   <div className="text-3xl font-black text-primary">
-                    ${calculateTotal()}{" "}
+                    {paymentMethod.includes("euro") ? "€" : "$"}{calculateTotal()}{" "}
                     <span className="text-sm font-medium text-slate-custom">
-                      {paymentMethod.includes("cup") ? "CUP" : "USD"}
+                      {
+                        paymentMethod.includes("cup") ? "CUP" : 
+                        paymentMethod.includes("eur") ? "EUR" : "USD"
+                      }
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-custom mt-2 italic">

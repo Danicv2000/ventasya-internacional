@@ -24,8 +24,21 @@ import { Logo } from "./icons/Logo";
 import { PeopleGroup } from "./icons/PeopleGroup";
 import { Mail } from "./icons/Mail";
 import { useTasasElToque } from "@/src/shared/hooks/use-elToque";
+import SplitText from "@/src/shared/ui/gsapSplitText";
+import ShinyText from "@/src/shared/ui/motionText";
 
 export default function LandingPage() {
+  // Para que no salgan los ✓ solos al inicio
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timerClear = setTimeout(() => {
+      setIsVisible(true);
+    }, 2000);
+
+    return () => clearTimeout(timerClear);
+  }, []);
+
   const { t } = useI18n();
   const [packageWeight, setPackageWeight] = useState(1.0);
   const [itemValue, setItemValue] = useState("");
@@ -33,9 +46,13 @@ export default function LandingPage() {
   const [paymentMethod, setPaymentMethod] = useState("cash-usd");
 
   // Hook para obtener las tasas de El Toque
-  const { data: tasasData, loading: tasasLoading, error: tasasError } = useTasasElToque({
-    dateFrom: `${new Date().toISOString().split('T')[0]} 00:00:01`,
-    dateTo: `${new Date().toISOString().split('T')[0]} 23:59:01`
+  const {
+    data: tasasData,
+    loading: tasasLoading,
+    error: tasasError,
+  } = useTasasElToque({
+    dateFrom: `${new Date().toISOString().split("T")[0]} 00:00:01`,
+    dateTo: `${new Date().toISOString().split("T")[0]} 23:59:01`,
   });
 
   // Mostrar la respuesta de El Toque en la consola
@@ -59,7 +76,7 @@ export default function LandingPage() {
      *
      * - Evalua si el metodo de pago seleccionado es en cup sino devuelve el el precio base
      * - Evalua si el metodo de pago es transferencia por cup y aplica la formula:
-     *    precio base * tasa de conversion + 20% 
+     *    precio base * tasa de conversion + 20%
      * - Si es pago en cup aplica la formula:
      *    precio base * tasa de conversion
      */
@@ -68,20 +85,19 @@ export default function LandingPage() {
     const packageWeightCost = packageWeight * 10;
 
     if (paymentMethod.includes("cup")) {
-      let cost = (baseCost + packageWeightCost) *  tasasData?.tasas.USD
+      let cost = (baseCost + packageWeightCost) * tasasData?.tasas.USD;
       if (paymentMethod === "transfer-cup") {
-        fee =  cost * 0.2;
+        fee = cost * 0.2;
       } else if (paymentMethod === "cash-cup") {
         fee = 0;
       }
       total = cost + fee;
     } else {
-      if (paymentMethod === "cash-usd"){
+      if (paymentMethod === "cash-usd") {
         total = baseCost + packageWeightCost;
-      }
-      else if (paymentMethod === "cash-euro"){
-        let dif = (baseCost + packageWeightCost) *  tasasData?.tasas.USD
-        total = (dif / tasasData?.tasas.ECU);
+      } else if (paymentMethod === "cash-euro") {
+        let dif = (baseCost + packageWeightCost) * tasasData?.tasas.USD;
+        total = dif / tasasData?.tasas.ECU;
       }
     }
 
@@ -96,104 +112,417 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-[#0d121c] dark:text-white transition-colors duration-300">
+    <div
+      className="
+        text-[#0d121c]
+        bg-background-light
+        transition-colors
+        dark:bg-background-dark dark:text-white duration-300
+      "
+    >
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-solid border-[#e6ebf4] dark:border-gray-800">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-primary">
+      <header
+        className="
+          z-50
+          bg-background-light/80
+          border-b border-solid border-[#e6ebf4]
+          sticky top-0 dark:bg-background-dark/80 backdrop-blur-md dark:border-gray-800
+        "
+      >
+        <div
+          className="
+            flex
+            max-w-[1280px]
+            mx-auto px-6 py-4
+            items-center justify-between
+            lg:px-10
+          "
+        >
+          <div
+            className="
+              flex
+              items-center gap-3
+            "
+          >
+            <div
+              className="
+                text-primary
+              "
+            >
               <Logo />
             </div>
-            <h2 className="text-xl font-extrabold tracking-tight">VentasYa</h2>
+            <h2
+              className="
+                text-xl font-extrabold tracking-tight
+              "
+            >
+              VentasYa
+            </h2>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
+          <nav
+            className="
+              hidden
+              items-center gap-8
+              md:flex
+            "
+          >
             <a
-              className="text-sm font-semibold hover:text-primary transition-colors"
               href="/commingsoon"
+              className="
+                text-sm font-semibold
+                transition-colors
+                hover:text-primary
+              "
             >
               Calculadora
             </a>
             <a
-              className="text-sm font-semibold hover:text-primary transition-colors"
               href="/commingsoon"
+              className="
+                text-sm font-semibold
+                transition-colors
+                hover:text-primary
+              "
             >
               Seguimiento
             </a>
             <a
-              className="text-sm font-semibold hover:text-primary transition-colors"
               href="/commingsoon"
+              className="
+                text-sm font-semibold
+                transition-colors
+                hover:text-primary
+              "
             >
               Tiendas
             </a>
             <a
-              className="text-sm font-semibold hover:text-primary transition-colors"
               href="/commingsoon"
+              className="
+                text-sm font-semibold
+                transition-colors
+                hover:text-primary
+              "
             >
               Soporte
             </a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" className="px-4 py-2 text-sm font-bold">
+          <div
+            className="
+              flex
+              items-center gap-3
+            "
+          >
+            <Button
+              variant="outline"
+              className="
+                px-4 py-2
+                text-sm font-bold
+              "
+            >
               Iniciar Sesión
             </Button>
-            <Button className="px-5 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-primary/20">
+            <Button
+              className="
+                px-5 py-2
+                text-sm font-bold text-white
+                bg-primary
+                rounded-lg
+                transition-colors shadow-lg shadow-primary/20
+                hover:bg-blue-700
+              "
+            >
               Registrarse
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-[1280px] mx-auto">
+      <main
+        className="
+          max-w-[1280px]
+          mx-auto
+        "
+      >
         {/* Hero Section with Calculator */}
-        <section className="flex flex-col lg:flex-row gap-12 px-6 lg:px-10 py-16 lg:py-24 items-center">
+        <section
+          className="
+            flex flex-col
+            px-6 py-16
+            gap-12 items-center
+            lg:flex-row lg:px-10 lg:py-24
+          "
+        >
           {/* Left: Value Prop */}
-          <div className="flex-1 space-y-8">
-            <div className="space-y-4">
-              <span className="inline-block py-1 px-3 bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider rounded-full">
-                {t("hero.head")}
-              </span>
-              <h1 className="text-5xl lg:text-7xl font-black leading-[1.1] tracking-tight">
-                {t("hero.title_section_1")}{" "}
-                <span className="text-primary">
-                  {t("hero.title_section_2")}
-                </span>
+          <div
+            className="
+              flex-1
+              space-y-8
+            "
+          >
+            <div
+              className="
+                space-y-4
+              "
+            >
+              <SplitText
+                text={t("hero.head")}
+                delay={50}
+                duration={1.25}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-100px"
+                textAlign="center"
+                className="
+                  inline-block
+                  py-1 px-3
+                  text-primary text-xs font-bold tracking-wider
+                  bg-primary/10
+                  rounded-full
+                  uppercase
+                "
+              />
+              <h1
+                className="
+                  text-5xl font-black leading-[1.1] tracking-tight
+                  lg:text-7xl
+                "
+              >
+                <SplitText
+                  text={t("hero.title_section_1")}
+                  delay={50}
+                  duration={1}
+                  ease="power3.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                  className="
+                    text-5xl font-black leading-[1.1] tracking-tight
+                    lg:text-7xl
+                  "
+                />
+                {""}
+                <SplitText
+                  text={t("hero.title_section_2")}
+                  delay={50}
+                  duration={1}
+                  ease="power3.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                  className="
+                    text-primary
+                  "
+                />
               </h1>
-              <p className="text-lg text-slate-custom dark:text-gray-400 max-w-xl leading-relaxed">
-                {t("hero.subtitle")}
-              </p>
+
+              <SplitText
+                text={t("hero.subtitle")}
+                delay={20}
+                duration={0.5}
+                ease="power3.out"
+                splitType="words"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-100px"
+                textAlign="center"
+                className="
+                  max-w-xl
+                  text-lg text-slate-custom leading-relaxed
+                  dark:text-gray-400
+                "
+              />
             </div>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <div className="text-green-500">✓</div>
-                {t("common.transparency")}
+            <div
+              className="
+                flex flex-wrap
+                gap-4
+              "
+            >
+              <div
+                className="
+                  flex
+                  text-sm font-medium
+                  items-center gap-2
+                "
+              >
+                <SplitText
+                  text="✓"
+                  delay={50}
+                  duration={2.5}
+                  ease="power3.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                  className={`
+                    text-green-500
+                    ${isVisible ? "visible" : "hidden"}
+                  `}
+                />
+
+                <ShinyText
+                  text={t("common.transparency")}
+                  speed={2}
+                  delay={0}
+                  color="black"
+                  shineColor="#ffffff"
+                  spread={120}
+                  direction="left"
+                  yoyo={false}
+                  pauseOnHover={false}
+                  disabled={false}
+                />
               </div>
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <div className="text-green-500">✓</div>
-                {t("tracking.title")}
+              <div
+                className="
+                  flex
+                  text-sm font-medium
+                  items-center gap-2
+                "
+              >
+                <SplitText
+                  text="✓"
+                  delay={50}
+                  duration={2.5}
+                  ease="power3.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                  className={`
+                    text-green-500
+                    ${isVisible ? "visible" : "hidden"}
+                  `}
+                />
+                <ShinyText
+                  text={t("tracking.title")}
+                  speed={2}
+                  delay={0}
+                  color="black"
+                  shineColor="#ffffff"
+                  spread={120}
+                  direction="left"
+                  yoyo={false}
+                  pauseOnHover={false}
+                  disabled={false}
+                />
               </div>
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <div className="text-green-500">✓</div>
-                {t("common.security")}
+              <div
+                className="
+                  flex
+                  text-sm font-medium
+                  items-center gap-2
+                "
+              >
+                <SplitText
+                  text="✓"
+                  delay={50}
+                  duration={2.5}
+                  ease="power3.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                  className={`
+                    text-green-500
+                    ${isVisible ? "visible" : "hidden"}
+                  `}
+                />
+                <ShinyText
+                  text={t("common.security")}
+                  speed={2}
+                  delay={0}
+                  color="black"
+                  shineColor="#ffffff"
+                  spread={120}
+                  direction="left"
+                  yoyo={false}
+                  pauseOnHover={false}
+                  disabled={false}
+                />
               </div>
             </div>
           </div>
 
           {/* Right: Interactive Calculator Widget */}
-          <div className="w-full lg:w-[460px]">
-            <Card className="calculator-card bg-white dark:bg-gray-900 p-8 rounded-xl border border-[#e6ebf4] dark:border-gray-800 shadow-lg">
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-primary" />
+
+          <div
+            className="
+              w-full
+              lg:w-[460px]
+            "
+          >
+            <Card
+              className="
+                p-8
+                bg-white
+                rounded-xl border border-[#e6ebf4]
+                shadow-lg
+                calculator-card dark:bg-gray-900 dark:border-gray-800
+              "
+            >
+              <h3
+                className="
+                  flex
+                  mb-6
+                  text-xl font-bold
+                  items-center gap-2
+                "
+              >
+                <Calculator
+                  className="
+                    h-5 w-5
+                    text-primary
+                  "
+                />
                 {t("calculator.title")}
               </h3>
 
-              <div className="space-y-6">
+              <div
+                className="
+                  space-y-6
+                "
+              >
                 {/* Store Selection */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                <div
+                  className="
+                    space-y-2
+                  "
+                >
+                  <label
+                    className="
+                      text-sm font-bold text-gray-700
+                      dark:text-gray-300
+                    "
+                  >
                     {t("calculator.store")}
                   </label>
                   <Select onValueChange={setSelectedStore}>
-                    <SelectTrigger className="w-full h-12 rounded-lg border-[#ced7e9] dark:border-gray-700 dark:bg-gray-800 text-sm">
+                    <SelectTrigger
+                      className="
+                        w-full h-12
+                        text-sm
+                        rounded-lg border-[#ced7e9]
+                        dark:border-gray-700 dark:bg-gray-800
+                      "
+                    >
                       <SelectValue placeholder="Amazon, Shein, Temu..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -206,21 +535,58 @@ export default function LandingPage() {
                 </div>
 
                 {/* Package Weight Slider */}
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                <div
+                  className="
+                    space-y-4
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      justify-between items-center
+                    "
+                  >
+                    <label
+                      className="
+                        text-sm font-bold text-gray-700
+                        dark:text-gray-300
+                      "
+                    >
                       {t("calculator.weight")}
                     </label>
-                    <span className="text-primary font-bold">
+                    <span
+                      className="
+                        text-primary font-bold
+                      "
+                    >
                       {packageWeight} lbs
                     </span>
                   </div>
 
-                  <div className="relative flex h-2 w-full items-center">
-                    <div className="h-full w-full rounded-full bg-[#ced7e9] dark:bg-gray-800 absolute"></div>
+                  <div
+                    className="
+                      flex
+                      h-2 w-full
+                      relative items-center
+                    "
+                  >
                     <div
-                      className="h-full rounded-full bg-primary absolute transition-all duration-100 ease-out"
+                      className="
+                        h-full w-full
+                        bg-[#ced7e9]
+                        rounded-full
+                        dark:bg-gray-800 absolute
+                      "
+                    ></div>
+                    <div
                       style={{ width: `${(packageWeight / 10) * 100}%` }}
+                      className="
+                        h-full
+                        bg-primary
+                        rounded-full
+                        transition-all
+                        absolute duration-100 ease-out
+                      "
                     ></div>
 
                     <input
@@ -232,27 +598,56 @@ export default function LandingPage() {
                       onChange={(e) =>
                         setPackageWeight(parseFloat(e.target.value))
                       }
-                      className="w-full h-6 absolute appearance-none bg-transparent cursor-pointer z-10 opacity-0"
                       style={{ top: "-8px" }}
+                      className="
+                        z-10
+                        w-full h-6
+                        bg-transparent
+                        cursor-pointer opacity-0
+                        absolute appearance-none
+                      "
                     />
 
                     <div
-                      className="size-5 rounded-full bg-white border-2 border-primary absolute shadow-md pointer-events-none transition-all duration-100 ease-out"
                       style={{
                         left: `${(packageWeight / 10) * 100}%`,
                         transform: "translateX(-50%)",
                       }}
+                      className="
+                        bg-white
+                        rounded-full border-2 border-primary
+                        shadow-md pointer-events-none transition-all
+                        size-5 absolute duration-100 ease-out
+                      "
                     ></div>
                   </div>
                 </div>
 
                 {/* Item Value Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                <div
+                  className="
+                    space-y-2
+                  "
+                >
+                  <label
+                    className="
+                      text-sm font-bold text-gray-700
+                      dark:text-gray-300
+                    "
+                  >
                     {t("calculator.value")}
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">
+                  <div
+                    className="
+                      relative
+                    "
+                  >
+                    <span
+                      className="
+                        text-gray-500 font-bold
+                        absolute left-4 top-1/2 -translate-y-1/2
+                      "
+                    >
                       $
                     </span>
                     <Input
@@ -260,52 +655,110 @@ export default function LandingPage() {
                       placeholder="0.00"
                       value={itemValue}
                       onChange={(e) => setItemValue(e.target.value)}
-                      className="w-full h-12 pl-8 rounded-lg border-[#ced7e9] dark:border-gray-700 dark:bg-gray-800 text-sm"
+                      className="
+                        w-full h-12
+                        pl-8
+                        text-sm
+                        rounded-lg border-[#ced7e9]
+                        dark:border-gray-700 dark:bg-gray-800
+                      "
                     />
                   </div>
                 </div>
 
                 {/* Payment Method Selector (NUEVO) */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                <div
+                  className="
+                    space-y-2
+                  "
+                >
+                  <label
+                    className="
+                      text-sm font-bold text-gray-700
+                      dark:text-gray-300
+                    "
+                  >
                     Método de Pago
                   </label>
                   <Select
                     onValueChange={setPaymentMethod}
                     value={paymentMethod}
                   >
-                    <SelectTrigger className="w-full h-12 rounded-lg border-[#ced7e9] dark:border-gray-700 dark:bg-gray-800 text-sm">
+                    <SelectTrigger
+                      className="
+                        w-full h-12
+                        text-sm
+                        rounded-lg border-[#ced7e9]
+                        dark:border-gray-700 dark:bg-gray-800
+                      "
+                    >
                       <SelectValue placeholder="Selecciona..." />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cash-usd">
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="
+                            flex
+                            items-center gap-2
+                          "
+                        >
                           <span>Efectivo / USD</span>
-                          <span className="text-xs text-green-600 font-normal">
+                          <span
+                            className="
+                              text-xs text-green-600 font-normal
+                            "
+                          >
                             (Sin Fee)
                           </span>
                         </div>
                       </SelectItem>
                       <SelectItem value="cash-euro">
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="
+                            flex
+                            items-center gap-2
+                          "
+                        >
                           <span>Efectivo / EURO</span>
-                          <span className="text-xs text-green-600 font-normal">
+                          <span
+                            className="
+                              text-xs text-green-600 font-normal
+                            "
+                          >
                             (Sin Fee)
                           </span>
                         </div>
                       </SelectItem>
                       <SelectItem value="cash-cup">
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="
+                            flex
+                            items-center gap-2
+                          "
+                        >
                           <span>Efectivo / CUP</span>
-                          <span className="text-xs text-red-500 font-normal">
+                          <span
+                            className="
+                              text-xs text-red-500 font-normal
+                            "
+                          >
                             (ElToque)
                           </span>
                         </div>
                       </SelectItem>
                       <SelectItem value="transfer-cup">
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="
+                            flex
+                            items-center gap-2
+                          "
+                        >
                           <span>Transferencia / CUP</span>
-                          <span className="text-xs text-gray-500 font-normal">
+                          <span
+                            className="
+                              text-xs text-gray-500 font-normal
+                            "
+                          >
                             (+20% Fee)
                           </span>
                         </div>
@@ -315,36 +768,87 @@ export default function LandingPage() {
                 </div>
 
                 {/* Result Box */}
-                <div className="bg-primary/5 dark:bg-primary/10 p-5 rounded-lg border border-primary/20">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-slate-custom uppercase">
+                <div
+                  className="
+                    p-5
+                    bg-primary/5
+                    rounded-lg border border-primary/20
+                    dark:bg-primary/10
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      mb-1
+                      justify-between items-center
+                    "
+                  >
+                    <span
+                      className="
+                        text-xs font-semibold text-slate-custom
+                        uppercase
+                      "
+                    >
                       {t("calculator.estimated")}
                     </span>
                     <div
-                      className="text-primary text-sm"
                       title="Tasa de El Toque del mercado informal"
+                      className="
+                        text-primary text-sm
+                      "
                     >
                       ℹ
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-primary">
-                    {paymentMethod.includes("euro") ? "€" : "$"}{calculateTotal()}{" "}
-                    <span className="text-sm font-medium text-slate-custom">
-                      {
-                        paymentMethod.includes("cup") ? "CUP" : 
-                        paymentMethod.includes("eur") ? "EUR" : "USD"
-                      }
+                  <div
+                    className="
+                      text-3xl font-black text-primary
+                    "
+                  >
+                    {paymentMethod.includes("euro") ? "€" : "$"}
+                    {calculateTotal()}{" "}
+                    <span
+                      className="
+                        text-sm font-medium text-slate-custom
+                      "
+                    >
+                      {paymentMethod.includes("cup")
+                        ? "CUP"
+                        : paymentMethod.includes("eur")
+                          ? "EUR"
+                          : "USD"}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-custom mt-2 italic">
+                  <p
+                    className="
+                      mt-2
+                      text-[10px] text-slate-custom
+                      italic
+                    "
+                  >
                     *{t("calculator.delivery_time")}
                   </p>
                 </div>
                 {/* Warning Cartel */}
                 {/* Solo se muestra si el peso sigue siendo 1.0 (valor inicial) */}
                 {packageWeight === 1.0 && (
-                  <div className="mt-3 flex items-start gap-2 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 p-3 rounded-lg text-xs border border-amber-200 dark:border-amber-800/50">
-                    <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <div
+                    className="
+                      flex
+                      mt-3 p-3
+                      text-amber-700 text-xs
+                      bg-amber-50
+                      rounded-lg border border-amber-200
+                      items-start gap-2 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50
+                    "
+                  >
+                    <AlertTriangle
+                      className="
+                        flex-shrink-0
+                        w-4 h-4
+                        mt-0.5
+                      "
+                    />
                     <p>
                       {t("calculator.warning.section_1")}{" "}
                       <strong>1 libra</strong>.{" "}
@@ -353,7 +857,17 @@ export default function LandingPage() {
                   </div>
                 )}
 
-                <Button className="w-full py-4 bg-primary text-white font-bold rounded-lg hover:bg-blue-700 transition-all transform active:scale-[0.98] shadow-lg shadow-primary/30">
+                <Button
+                  className="
+                    w-full
+                    py-4
+                    text-white font-bold
+                    bg-primary
+                    rounded-lg
+                    transition-all shadow-lg shadow-primary/30
+                    hover:bg-blue-700 transform active:scale-[0.98]
+                  "
+                >
                   {t("hero.cta")}
                 </Button>
               </div>
@@ -362,100 +876,365 @@ export default function LandingPage() {
         </section>
 
         {/* Trust Bar / Partners */}
-        <section className="px-6 lg:px-10 py-12 border-y border-[#e6ebf4] dark:border-gray-800">
-          <p className="text-center text-xs font-bold text-slate-custom uppercase tracking-[0.2em] mb-8">
+
+        <section
+          className="
+            px-6 py-12
+            border-y border-[#e6ebf4]
+            dark:border-gray-800
+            lg:px-10
+          "
+        >
+          <p
+            className="
+              mb-8
+              text-center text-xs font-bold text-slate-custom tracking-[0.2em]
+              uppercase
+            "
+          >
             {t("stores.title")}
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-            <span className="text-2xl font-black">AMAZON</span>
-            <span className="text-2xl font-black italic">SHEIN</span>
-            <span className="text-2xl font-black">TEMU</span>
+          <div
+            className="
+              flex flex-wrap
+              opacity-50 transition-all
+              justify-center items-center gap-12 grayscale hover:grayscale-0 duration-500
+            "
+          >
+            <span
+              className="
+                text-2xl font-black
+                partnerItems
+              "
+            >
+              AMAZON
+            </span>
+            <span
+              className="
+                text-2xl font-black
+                partnerItems italic
+              "
+            >
+              SHEIN
+            </span>
+            <span
+              className="
+                text-2xl font-black
+                partnerItems
+              "
+            >
+              TEMU
+            </span>
           </div>
         </section>
 
         {/* Security & Tracking Section */}
-        <section className="px-6 lg:px-10 py-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="relative">
+        <section
+          className="
+            px-6 py-24
+            lg:px-10
+          "
+        >
+          <div
+            className="
+              grid
+              gap-16 items-center
+              lg:grid-cols-2
+            "
+          >
+            <div
+              className="
+                relative
+              "
+            >
               <div
-                className="bg-gray-200 dark:bg-gray-800 rounded-2xl aspect-video overflow-hidden shadow-2xl relative"
                 data-location="Miami to Havana route map"
                 style={{}}
+                className="
+                  overflow-hidden
+                  bg-gray-200
+                  rounded-2xl
+                  shadow-2xl
+                  dark:bg-gray-800 aspect-video relative
+                "
               >
                 <img
                   alt="Global tracking map"
-                  className="w-full h-full object-cover opacity-60 dark:opacity-40"
                   data-alt="Satellite map showing delivery route from USA to Cuba"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBdVIZ2FMi97kyfpKLUJx_Wh1Vijmzjlg3gmOxGdbbn-s-zQCr0IMfLhM7boGjvjdwlsRdrkrRavFYaolp_Mg_Tr73HT_6_U-VDtcRwnd6pwyQPw7rjEk1B-dBpcJC-TTpl9fmPrrHNwmbYFDMlEQSjEz7hgYeURl4RzK42bxKMVJONpXi9mbefxINDeT19CQ2T0qifMfzy9-Dd9wCaILM4FjgAEyk5jNGBVJz4fFzMqWTB0QY6pbNpxCCC9i6QNfzIDK0pPm4oA4"
+                  className="
+                    object-cover
+                    w-full h-full
+                    opacity-60
+                    dark:opacity-40
+                  "
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background-light dark:from-background-dark via-transparent to-transparent"></div>
+                <div
+                  className="
+                    bg-gradient-to-t from-background-light via-transparent to-transparent
+                    absolute inset-0 dark:from-background-dark
+                  "
+                ></div>
                 {/* Mock Tracking Widget */}
-                <div className="absolute top-6 right-6 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-xl border border-primary/20 w-64 animate-pulse">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="size-3 rounded-full bg-green-500"></div>
-                    <div className="text-sm font-bold">
+                <div
+                  className="
+                    w-64
+                    p-4
+                    bg-white
+                    rounded-xl border border-primary/20
+                    shadow-xl animate-pulse
+                    absolute top-6 right-6 dark:bg-gray-900
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      mb-3
+                      items-center gap-3
+                    "
+                  >
+                    <div
+                      className="
+                        bg-green-500
+                        rounded-full
+                        size-3
+                      "
+                    ></div>
+                    <div
+                      className="
+                        text-sm font-bold
+                      "
+                    >
                       {t("tracking.in_transit")}
                     </div>
                   </div>
-                  <div className="text-xs text-slate-custom mb-2">
+                  <div
+                    className="
+                      mb-2
+                      text-xs text-slate-custom
+                    "
+                  >
                     Pedido #VENTASYA-001
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="
+                      w-full h-2
+                      bg-gray-200
+                      rounded-full
+                      dark:bg-gray-700
+                    "
+                  >
                     <div
-                      className="bg-primary h-2 rounded-full"
                       style={{ width: "75%" }}
+                      className="
+                        h-2
+                        bg-primary
+                        rounded-full
+                      "
                     ></div>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-custom mt-2">
+                  <div
+                    className="
+                      flex
+                      mt-2
+                      text-xs text-slate-custom
+                      justify-between
+                    "
+                  >
                     <span>USA</span>
                     <span>Cuba</span>
                   </div>
                 </div>
-                <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-primary h-full w-[70%]"></div>
+                <div
+                  className="
+                    overflow-hidden
+                    w-full h-1.5
+                    bg-gray-100
+                    rounded-full
+                    dark:bg-gray-800
+                  "
+                >
+                  <div
+                    className="
+                      h-full w-[70%]
+                      bg-primary
+                    "
+                  ></div>
                 </div>
               </div>
               {/*Decorative Elements*/}
-              <div className="absolute -bottom-6 -left-6 bg-primary size-24 rounded-2xl -z-10 opacity-20"></div>
+              <div
+                className="
+                  bg-primary
+                  rounded-2xl
+                  opacity-20
+                  absolute -bottom-6 -left-6 size-24 -z-10
+                "
+              ></div>
             </div>
 
             {/* Feature Cards */}
-            <div className="space-y-8">
-              <h2 className="text-4xl font-black">
+            <div
+              className="
+                space-y-8
+              "
+            >
+              <h2
+                className="
+                  text-4xl font-black
+                "
+              >
                 {t("tracking.title")}{" "}
-                <span className="text-primary">{t("tracking.24_7")}</span>
+                <span
+                  className="
+                    text-primary
+                  "
+                >
+                  {t("tracking.24_7")}
+                </span>
               </h2>
-              <p className="text-slate-custom dark:text-gray-400 leading-relaxed">
+              <p
+                className="
+                  text-slate-custom leading-relaxed
+                  dark:text-gray-400
+                "
+              >
                 {t("tracking.description")}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="p-5 rounded-xl border border-[#e6ebf4] dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
-                  <div className="size-12 flex items-center justify-center text-primary">
-                    <ShieldCheck className="h-10 w-10" />
+              <div
+                className="
+                  grid grid-cols-1
+                  gap-6
+                  sm:grid-cols-3
+                "
+              >
+                <div
+                  className="
+                    p-5
+                    bg-white/50
+                    rounded-xl border border-[#e6ebf4]
+                    dark:border-gray-800 dark:bg-gray-900/50
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      text-primary
+                      size-12 items-center justify-center
+                    "
+                  >
+                    <ShieldCheck
+                      className="
+                        h-10 w-10
+                      "
+                    />
                   </div>
-                  <h4 className="font-bold mb-1">Seguro de Carga</h4>
-                  <p className="text-xs text-slate-custom">
+                  <h4
+                    className="
+                      mb-1
+                      font-bold
+                    "
+                  >
+                    Seguro de Carga
+                  </h4>
+                  <p
+                    className="
+                      text-xs text-slate-custom
+                    "
+                  >
                     Protección total contra daños o pérdidas durante el
                     trayecto.
                   </p>
                 </div>
-                <div className="p-5 rounded-xl border border-[#e6ebf4] dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
-                  <div className="size-12 flex items-center justify-center text-primary">
-                    <Lock className="h-10 w-10" />
+                <div
+                  className="
+                    p-5
+                    bg-white/50
+                    rounded-xl border border-[#e6ebf4]
+                    dark:border-gray-800 dark:bg-gray-900/50
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      text-primary
+                      size-12 items-center justify-center
+                    "
+                  >
+                    <Lock
+                      className="
+                        h-10 w-10
+                      "
+                    />
                   </div>
-                  <h4 className="font-bold mb-1">Pagos Seguros</h4>
-                  <div className="flex gap-2 mt-2 opacity-70"></div>
-                  <p className="text-xs text-slate-custom mt-2">
+                  <h4
+                    className="
+                      mb-1
+                      font-bold
+                    "
+                  >
+                    Pagos Seguros
+                  </h4>
+                  <div
+                    className="
+                      flex
+                      mt-2
+                      opacity-70
+                      gap-2
+                    "
+                  ></div>
+                  <p
+                    className="
+                      mt-2
+                      text-xs text-slate-custom
+                    "
+                  >
                     Aceptamos tarjetas y efectivo en distintas monedas.
                   </p>
                 </div>
-                <div className="p-5 rounded-xl border border-[#e6ebf4] dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
-                  <div className="size-12 flex items-center justify-center text-primary">
-                    <Headset className="h-10 w-10" />
+                <div
+                  className="
+                    p-5
+                    bg-white/50
+                    rounded-xl border border-[#e6ebf4]
+                    dark:border-gray-800 dark:bg-gray-900/50
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      text-primary
+                      size-12 items-center justify-center
+                    "
+                  >
+                    <Headset
+                      className="
+                        h-10 w-10
+                      "
+                    />
                   </div>
-                  <h4 className="font-bold mb-1">Soporte</h4>
-                  <div className="flex gap-2 mt-2 opacity-70"></div>
-                  <p className="text-xs text-slate-custom mt-2">
+                  <h4
+                    className="
+                      mb-1
+                      font-bold
+                    "
+                  >
+                    Soporte
+                  </h4>
+                  <div
+                    className="
+                      flex
+                      mt-2
+                      opacity-70
+                      gap-2
+                    "
+                  ></div>
+                  <p
+                    className="
+                      mt-2
+                      text-xs text-slate-custom
+                    "
+                  >
                     Brindamos soporte tecnico y asesorias 24h.
                   </p>
                 </div>
@@ -465,76 +1244,311 @@ export default function LandingPage() {
         </section>
 
         {/* Testimonials */}
-        <section className="px-6 lg:px-10 py-24 bg-white dark:bg-background-dark/50">
-          <div className="max-w-4xl mx-auto space-y-12">
-            <h2 className="text-4xl font-black text-center">
+        <section
+          className="
+            px-6 py-24
+            bg-white
+            dark:bg-background-dark/50
+            lg:px-10
+          "
+        >
+          <div
+            className="
+              max-w-4xl
+              mx-auto space-y-12
+            "
+          >
+            <h2
+              className="
+                text-4xl font-black text-center
+              "
+            >
               {t("common.reviews_title")}
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div
+              className="
+                grid
+                gap-8
+                md:grid-cols-3
+              "
+            >
               {/* Testimonial Cards */}
-              <Card className="bg-background-light dark:bg-gray-900 p-6 rounded-2xl border border-[#e6ebf4] dark:border-gray-800">
-                <div className="flex items-center gap-1 mb-4">
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
+              <Card
+                className="
+                  p-6
+                  bg-background-light
+                  rounded-2xl border border-[#e6ebf4]
+                  dark:bg-gray-900 dark:border-gray-800
+                "
+              >
+                <div
+                  className="
+                    flex
+                    mb-4
+                    items-center gap-1
+                  "
+                >
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
                 </div>
-                <p className="text-slate-custom dark:text-gray-400 mb-6">
+                <p
+                  className="
+                    mb-6
+                    text-slate-custom
+                    dark:text-gray-400
+                  "
+                >
                   "La mejor experiencia de compra internacional que he tenido.
                   Todo llegó en perfecto estado y en el tiempo prometido."
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div
+                  className="
+                    flex
+                    items-center gap-3
+                  "
+                >
+                  <div
+                    className="
+                      bg-gray-200
+                      rounded-full
+                      size-10 dark:bg-gray-700
+                    "
+                  ></div>
                   <div>
-                    <h4 className="font-bold">María González</h4>
-                    <p className="text-sm text-slate-custom dark:text-gray-500">
+                    <h4
+                      className="
+                        font-bold
+                      "
+                    >
+                      María González
+                    </h4>
+                    <p
+                      className="
+                        text-sm text-slate-custom
+                        dark:text-gray-500
+                      "
+                    >
                       Havana
                     </p>
                   </div>
                 </div>
               </Card>
 
-              <Card className="bg-background-light dark:bg-gray-900 p-6 rounded-2xl border border-[#e6ebf4] dark:border-gray-800">
-                <div className="flex items-center gap-1 mb-4">
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
+              <Card
+                className="
+                  p-6
+                  bg-background-light
+                  rounded-2xl border border-[#e6ebf4]
+                  dark:bg-gray-900 dark:border-gray-800
+                "
+              >
+                <div
+                  className="
+                    flex
+                    mb-4
+                    items-center gap-1
+                  "
+                >
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
                 </div>
-                <p className="text-slate-custom dark:text-gray-400 mb-6">
+                <p
+                  className="
+                    mb-6
+                    text-slate-custom
+                    dark:text-gray-400
+                  "
+                >
                   "El seguimiento en tiempo real me dio mucha tranquilidad.
                   Sabía exactamente dónde estaba mi pedido en todo momento."
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div
+                  className="
+                    flex
+                    items-center gap-3
+                  "
+                >
+                  <div
+                    className="
+                      bg-gray-200
+                      rounded-full
+                      size-10 dark:bg-gray-700
+                    "
+                  ></div>
                   <div>
-                    <h4 className="font-bold">Carlos Rodríguez</h4>
-                    <p className="text-sm text-slate-custom dark:text-gray-500">
+                    <h4
+                      className="
+                        font-bold
+                      "
+                    >
+                      Carlos Rodríguez
+                    </h4>
+                    <p
+                      className="
+                        text-sm text-slate-custom
+                        dark:text-gray-500
+                      "
+                    >
                       Santiago
                     </p>
                   </div>
                 </div>
               </Card>
 
-              <Card className="bg-background-light dark:bg-gray-900 p-6 rounded-2xl border border-[#e6ebf4] dark:border-gray-800">
-                <div className="flex items-center gap-1 mb-4">
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
-                  <Star className="h-4 w-4 text-amber-400 fill-current" />
+              <Card
+                className="
+                  p-6
+                  bg-background-light
+                  rounded-2xl border border-[#e6ebf4]
+                  dark:bg-gray-900 dark:border-gray-800
+                "
+              >
+                <div
+                  className="
+                    flex
+                    mb-4
+                    items-center gap-1
+                  "
+                >
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
+                  <Star
+                    className="
+                      h-4 w-4
+                      text-amber-400
+                      fill-current
+                    "
+                  />
                 </div>
-                <p className="text-slate-custom dark:text-gray-400 mb-6">
+                <p
+                  className="
+                    mb-6
+                    text-slate-custom
+                    dark:text-gray-400
+                  "
+                >
                   "Increíble servicio. La calculadora de costos es precisa y el
                   proceso de compra es muy sencillo."
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div
+                  className="
+                    flex
+                    items-center gap-3
+                  "
+                >
+                  <div
+                    className="
+                      bg-gray-200
+                      rounded-full
+                      size-10 dark:bg-gray-700
+                    "
+                  ></div>
                   <div>
-                    <h4 className="font-bold">Ana Martínez</h4>
-                    <p className="text-sm text-slate-custom dark:text-gray-500">
+                    <h4
+                      className="
+                        font-bold
+                      "
+                    >
+                      Ana Martínez
+                    </h4>
+                    <p
+                      className="
+                        text-sm text-slate-custom
+                        dark:text-gray-500
+                      "
+                    >
                       Camagüey
                     </p>
                   </div>
@@ -545,68 +1559,234 @@ export default function LandingPage() {
         </section>
 
         {/* Process Steps */}
-        <section className="px-6 lg:px-10 py-20 bg-primary/5 dark:bg-primary/5 rounded-[2.5rem] my-10 mx-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-black mb-4">
+        <section
+          className="
+            px-6 py-20 my-10 mx-6
+            bg-primary/5
+            rounded-[2.5rem]
+            dark:bg-primary/5
+            lg:px-10
+          "
+        >
+          <div
+            className="
+              max-w-2xl
+              mx-auto mb-16
+              text-center
+            "
+          >
+            <h2
+              className="
+                mb-4
+                text-3xl font-black
+              "
+            >
               {t("process_steps.title")}
             </h2>
-            <p className="text-slate-custom dark:text-gray-400">
+            <p
+              className="
+                text-slate-custom
+                dark:text-gray-400
+              "
+            >
               {t("process_steps.subtitle")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+          <div
+            className="
+              grid grid-cols-1
+              gap-8
+              md:grid-cols-3
+              lg:grid-cols-5
+            "
+          >
             {/* Step 1 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+            <div
+              className="
+                space-y-4
+                text-center
+                relative
+              "
+            >
+              <div
+                className="
+                  flex
+                  mx-auto
+                  text-2xl font-black text-primary
+                  bg-white
+                  rounded-2xl border border-[#e6ebf4]
+                  shadow-sm
+                  size-16 dark:bg-gray-900 dark:border-gray-800 items-center justify-center
+                "
+              >
                 {t("process_steps.step_1.nro")}
               </div>
-              <h4 className="font-bold">{t("process_steps.step_1.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
+              <h4
+                className="
+                  font-bold
+                "
+              >
+                {t("process_steps.step_1.title")}
+              </h4>
+              <p
+                className="
+                  px-4
+                  text-sm text-slate-custom
+                "
+              >
                 {t("process_steps.step_1.description")}
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+            <div
+              className="
+                space-y-4
+                text-center
+                relative
+              "
+            >
+              <div
+                className="
+                  flex
+                  mx-auto
+                  text-2xl font-black text-primary
+                  bg-white
+                  rounded-2xl border border-[#e6ebf4]
+                  shadow-sm
+                  size-16 dark:bg-gray-900 dark:border-gray-800 items-center justify-center
+                "
+              >
                 {t("process_steps.step_2.nro")}
               </div>
-              <h4 className="font-bold">{t("process_steps.step_2.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
+              <h4
+                className="
+                  font-bold
+                "
+              >
+                {t("process_steps.step_2.title")}
+              </h4>
+              <p
+                className="
+                  px-4
+                  text-sm text-slate-custom
+                "
+              >
                 {t("process_steps.step_2.description")}
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+            <div
+              className="
+                space-y-4
+                text-center
+                relative
+              "
+            >
+              <div
+                className="
+                  flex
+                  mx-auto
+                  text-2xl font-black text-primary
+                  bg-white
+                  rounded-2xl border border-[#e6ebf4]
+                  shadow-sm
+                  size-16 dark:bg-gray-900 dark:border-gray-800 items-center justify-center
+                "
+              >
                 {t("process_steps.step_3.nro")}
               </div>
-              <h4 className="font-bold">{t("process_steps.step_3.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
+              <h4
+                className="
+                  font-bold
+                "
+              >
+                {t("process_steps.step_3.title")}
+              </h4>
+              <p
+                className="
+                  px-4
+                  text-sm text-slate-custom
+                "
+              >
                 {t("process_steps.step_3.description")}
               </p>
             </div>
 
             {/* Step 4 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+            <div
+              className="
+                space-y-4
+                text-center
+                relative
+              "
+            >
+              <div
+                className="
+                  flex
+                  mx-auto
+                  text-2xl font-black text-primary
+                  bg-white
+                  rounded-2xl border border-[#e6ebf4]
+                  shadow-sm
+                  size-16 dark:bg-gray-900 dark:border-gray-800 items-center justify-center
+                "
+              >
                 {t("process_steps.step_4.nro")}
               </div>
-              <h4 className="font-bold">{t("process_steps.step_4.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
+              <h4
+                className="
+                  font-bold
+                "
+              >
+                {t("process_steps.step_4.title")}
+              </h4>
+              <p
+                className="
+                  px-4
+                  text-sm text-slate-custom
+                "
+              >
                 {t("process_steps.step_4.description")}
               </p>
             </div>
 
             {/* Step 5 (NUEVO) */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
+            <div
+              className="
+                space-y-4
+                text-center
+                relative
+              "
+            >
+              <div
+                className="
+                  flex
+                  mx-auto
+                  text-2xl font-black text-primary
+                  bg-white
+                  rounded-2xl border border-[#e6ebf4]
+                  shadow-sm
+                  size-16 dark:bg-gray-900 dark:border-gray-800 items-center justify-center
+                "
+              >
                 {t("process_steps.step_5.nro")}
               </div>
-              <h4 className="font-bold">{t("process_steps.step_5.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
+              <h4
+                className="
+                  font-bold
+                "
+              >
+                {t("process_steps.step_5.title")}
+              </h4>
+              <p
+                className="
+                  px-4
+                  text-sm text-slate-custom
+                "
+              >
                 {t("process_steps.step_5.description")}
               </p>
             </div>
@@ -614,10 +1794,39 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="px-6 lg:px-10 py-24 text-center">
-          <div className="max-w-4xl mx-auto bg-primary rounded-3xl p-12 lg:p-20 text-white relative overflow-hidden shadow-2xl shadow-primary/40">
-            <div className="absolute top-0 right-0 p-10 opacity-10">
-              <span className="material-symbols-outlined text-[12rem]">
+        <section
+          className="
+            px-6 py-24
+            text-center
+            lg:px-10
+          "
+        >
+          <div
+            className="
+              overflow-hidden
+              max-w-4xl
+              mx-auto p-12
+              text-white
+              bg-primary
+              rounded-3xl
+              shadow-2xl shadow-primary/40
+              relative
+              lg:p-20
+            "
+          >
+            <div
+              className="
+                p-10
+                opacity-10
+                absolute top-0 right-0
+              "
+            >
+              <span
+                className="
+                  text-[12rem]
+                  material-symbols-outlined
+                "
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="200"
@@ -631,18 +1840,60 @@ export default function LandingPage() {
                 </svg>
               </span>
             </div>
-            <div className="relative z-10 space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-black leading-tight">
+            <div
+              className="
+                z-10
+                space-y-8
+                relative
+              "
+            >
+              <h2
+                className="
+                  text-4xl font-black leading-tight
+                  lg:text-5xl
+                "
+              >
                 {t("common.ready_to_buy")}
               </h2>
-              <p className="text-lg opacity-90 max-w-2xl mx-auto">
+              <p
+                className="
+                  max-w-2xl
+                  mx-auto
+                  text-lg
+                  opacity-90
+                "
+              >
                 {t("hero.description")}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="px-10 py-4 bg-white text-primary font-black rounded-xl hover:bg-gray-100 transition-colors shadow-xl">
+              <div
+                className="
+                  flex flex-col
+                  gap-4 justify-center
+                  sm:flex-row
+                "
+              >
+                <button
+                  className="
+                    px-10 py-4
+                    text-primary font-black
+                    bg-white
+                    rounded-xl
+                    transition-colors shadow-xl
+                    hover:bg-gray-100
+                  "
+                >
                   {t("common.create_account")}
                 </button>
-                <button className="px-10 py-4 bg-primary border-2 border-white/30 text-white font-black rounded-xl hover:bg-white/10 transition-colors">
+                <button
+                  className="
+                    px-10 py-4
+                    text-white font-black
+                    bg-primary
+                    border-2 border-white/30 rounded-xl
+                    transition-colors
+                    hover:bg-white/10
+                  "
+                >
                   {t("common.talk_to_agent")}
                 </button>
               </div>
@@ -651,15 +1902,58 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 border-t border-[#e6ebf4] dark:border-gray-800">
-        <div className="grid md:grid-cols-4 gap-12">
-          <div className="col-span-2 md:col-span-1 space-y-6">
-            <h3 className="font-bold text-lg mb-4">{t("footer.title")}</h3>
-            <p className="text-slate-custom dark:text-gray-400 text-sm">
+      <footer
+        className="
+          max-w-[1280px]
+          mx-auto px-6 py-12
+          border-t border-[#e6ebf4]
+          dark:border-gray-800
+          lg:px-10
+        "
+      >
+        <div
+          className="
+            grid
+            gap-12
+            md:grid-cols-4
+          "
+        >
+          <div
+            className="
+              space-y-6
+              col-span-2
+              md:col-span-1
+            "
+          >
+            <h3
+              className="
+                mb-4
+                font-bold text-lg
+              "
+            >
+              {t("footer.title")}
+            </h3>
+            <p
+              className="
+                text-slate-custom text-sm
+                dark:text-gray-400
+              "
+            >
               {t("footer.subtitle")}
             </p>
-            <div className="flex gap-4">
-              <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
+            <div
+              className="
+                flex
+                gap-4
+              "
+            >
+              <span
+                className="
+                  text-slate-custom
+                  cursor-pointer
+                  material-symbols-outlined hover:text-primary
+                "
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="25"
@@ -672,64 +1966,164 @@ export default function LandingPage() {
                   />
                 </svg>
               </span>
-              <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
+              <span
+                className="
+                  text-slate-custom
+                  cursor-pointer
+                  material-symbols-outlined hover:text-primary
+                "
+              >
                 <PeopleGroup />
               </span>
-              <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
-
-              </span>
+              <span
+                className="
+                  text-slate-custom
+                  cursor-pointer
+                  material-symbols-outlined hover:text-primary
+                "
+              ></span>
             </div>
           </div>
-          <div className="space-y-4">
-            <h4 className="font-bold mb-4">{t("footer.services.title")}</h4>
-            <ul className="text-sm text-slate-custom space-y-2">
+          <div
+            className="
+              space-y-4
+            "
+          >
+            <h4
+              className="
+                mb-4
+                font-bold
+              "
+            >
+              {t("footer.services.title")}
+            </h4>
+            <ul
+              className="
+                space-y-2
+                text-sm text-slate-custom
+              "
+            >
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.services.sea_shipping")}
                 </a>
               </li>
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.services.aerial_shipping")}
                 </a>
               </li>
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.services.assisted_purchase")}
                 </a>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold mb-4">{t("footer.resources.title")}</h4>
-            <ul className="space-y-2 text-sm text-slate-custom dark:text-gray-400">
+            <h4
+              className="
+                mb-4
+                font-bold
+              "
+            >
+              {t("footer.resources.title")}
+            </h4>
+            <ul
+              className="
+                space-y-2
+                text-sm text-slate-custom
+                dark:text-gray-400
+              "
+            >
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.resources.faq")}
                 </a>
               </li>
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.resources.calculator")}
                 </a>
               </li>
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.resources.terms")}
                 </a>
               </li>
               <li>
-                <a className="hover:text-primary" href="#">
+                <a
+                  href="#"
+                  className="
+                    hover:text-primary
+                  "
+                >
                   {t("footer.resources.blog")}
                 </a>
               </li>
             </ul>
           </div>
-          <div className="space-y-4">
-            <h4 className="font-bold mb-4">{t("footer.contact.title")}</h4>
-            <ul className="text-sm text-slate-custom space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">
+          <div
+            className="
+              space-y-4
+            "
+          >
+            <h4
+              className="
+                mb-4
+                font-bold
+              "
+            >
+              {t("footer.contact.title")}
+            </h4>
+            <ul
+              className="
+                space-y-2
+                text-sm text-slate-custom
+              "
+            >
+              <li
+                className="
+                  flex
+                  items-center gap-2
+                "
+              >
+                <span
+                  className="
+                    text-xs
+                    material-symbols-outlined
+                  "
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -744,14 +2138,34 @@ export default function LandingPage() {
                 </span>
                 +1 (305) 555-0123
               </li>
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">
+              <li
+                className="
+                  flex
+                  items-center gap-2
+                "
+              >
+                <span
+                  className="
+                    text-xs
+                    material-symbols-outlined
+                  "
+                >
                   <Mail color="#434b51" size={20} />
                 </span>
                 soporte@ventasya.com
               </li>
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">
+              <li
+                className="
+                  flex
+                  items-center gap-2
+                "
+              >
+                <span
+                  className="
+                    text-xs
+                    material-symbols-outlined
+                  "
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -770,19 +2184,60 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-[1280px] mx-auto mt-12 pt-8 border-t border-[#e6ebf4] dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-slate-custom">
-            © {new Date().getFullYear()} VentasYa. {t("common.all_rights_reserved")}.
+        <div
+          className="
+            flex flex-col
+            max-w-[1280px]
+            mx-auto mt-12 pt-8
+            border-t border-[#e6ebf4]
+            dark:border-gray-800 justify-between items-center gap-4
+            md:flex-row
+          "
+        >
+          <p
+            className="
+              text-xs text-slate-custom
+            "
+          >
+            © {new Date().getFullYear()} VentasYa.{" "}
+            {t("common.all_rights_reserved")}.
           </p>
-          <div className="flex items-center gap-6 text-xs text-slate-custom">
-            <a className="hover:text-primary" href="#">
+          <div
+            className="
+              flex
+              text-xs text-slate-custom
+              items-center gap-6
+            "
+          >
+            <a
+              href="#"
+              className="
+                hover:text-primary
+              "
+            >
               Privacidad
             </a>
-            <a className="hover:text-primary" href="#">
+            <a
+              href="#"
+              className="
+                hover:text-primary
+              "
+            >
               Cookies
             </a>
-            <div className="flex items-center gap-2 ml-4">
-              <span className="material-symbols-outlined text-sm">
+            <div
+              className="
+                flex
+                ml-4
+                items-center gap-2
+              "
+            >
+              <span
+                className="
+                  text-sm
+                  material-symbols-outlined
+                "
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"

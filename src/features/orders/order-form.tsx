@@ -11,6 +11,7 @@ import { Textarea } from "@/src/shared/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/ui/select"
 import { AlertCircle, ShoppingCart, Sparkles, Send } from "lucide-react"
 import { Alert, AlertDescription } from "@/src/shared/ui/alert"
+import { sileo } from "sileo"
 import { TemuIcon, SheinIcon, AmazonIcon } from '@/src/features/common/platform-icons'
 
 export function OrderForm() {
@@ -52,8 +53,7 @@ export function OrderForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // In production, this would send to API
-    console.log("[v0] Order request submitted:", formData)
+      sileo.success({ title: 'Pedido enviado correctamente' })
 
     setTimeout(() => {
       alert("¡Solicitud enviada! Te contactaremos por WhatsApp con el PRIMER PAGO (producto + seguro) en breve.")

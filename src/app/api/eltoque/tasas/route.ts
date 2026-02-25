@@ -1,18 +1,9 @@
 import { NextRequest } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const dateFrom = searchParams.get('date_from') || '';
-    const dateTo = searchParams.get('date_to') || '';
+export const dynamic = 'force-dynamic';
 
-    // Validate required parameters
-    if (!dateFrom || !dateTo) {
-      return Response.json(
-        { error: 'date_from and date_to parameters are required' },
-        { status: 400 }
-      );
-    }
+export async function GET() {
+  try {
 
     const token = process.env.NEXT_PUBLIC_ELTOQUE_API_TOKEN;
     
@@ -22,6 +13,11 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
+
+     // Obtener fechas automáticamente si no se proporcionan
+      const today = new Date().toISOString().split('T')[0];
+      const dateFrom = `${today} 00:00:01`;
+      const dateTo =  `${today} 23:59:01`;
 
     // Construct the API URL
     const apiUrl = `https://tasas.eltoque.com/v1/trmi?date_from=${encodeURIComponent(dateFrom)}&date_to=${encodeURIComponent(dateTo)}`;
@@ -47,12 +43,13 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    // Return the data with appropriate headers to prevent CORS issues
+    // Return the data with appropriate headers to prevent CORS issues and enable caching
     return Response.json(data, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800', // Cache for 1 hour
       },
     });
   } catch (error: any) {

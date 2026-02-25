@@ -1,0 +1,804 @@
+1:"use client";
+3:import { useState, useEffect } from "react";
+4:import { supabase } from "@/src/lib/supabase-client";
+5:import { sileo } from "sileo";
+6:import {
+7:  Dialog,
+8:  DialogContent,
+9:  DialogHeader,
+10:  DialogTitle,
+11:} from "@/src/shared/ui/dialog";
+12:import { Button } from "@/src/shared/ui/button";
+13:import { Input } from "@/src/shared/ui/input";
+14:import { Label } from "@/src/shared/ui/label";
+15:import { Textarea } from "@/src/shared/ui/textarea";
+16:import {
+17:  Select,
+18:  SelectContent,
+19:  SelectItem,
+20:  SelectTrigger,
+21:  SelectValue,
+22:} from "@/src/shared/ui/select";
+23:import {
+24:  Calculator,
+25:  Save,
+26:  User,
+27:  Package,
+28:  DollarSign,
+29:  ShoppingCart,
+30:  LinkIcon,
+31:  Scale,
+32:  Store,
+33:  Plus,
+34:  X,
+35:} from "lucide-react";
+36:import { Card } from "@/src/shared/ui/card";
+37:import {
+38:  TemuIcon,
+39:  SheinIcon,
+40:  AmazonIcon,
+41:} from "@/src/features/common/platform-icons";
+42:import { useI18n } from "@/src/shared/hooks/use-i18n";
+43:import { useExchangeRate } from "@/src/shared/hooks/use-exchange-rate";
+45:interface ProductItem {
+46:  id: string;
+47:  name: string;
+48:  url: string;
+49:  price: string;
+50:  quantity: number;
+51:  weight: string;
+52:  store: string;
+53:}
+55:interface CreateOrderModalProps {
+56:  isOpen: boolean;
+57:  onClose: () => void;
+58:  onSave: (orderData: any) => void;
+59:}
+61:export function CreateOrderModal({
+62:  isOpen,
+63:  onClose,
+64:  onSave,
+65:}: CreateOrderModalProps) {
+66:  const { t } = useI18n();
+68:  // Fetch exchange rates from El Toque API
+69:  const {
+70:    exchangeRate,
+71:    exchangeRates,
+72:    loading: tasasLoading,
+73:    error: tasasError,
+74:  } = useExchangeRate();
+76:  const [formData, setFormData] = useState({
+77:    clientName: "",
+78:    clientPhone: "",
+79:    shippingAddress: "",
+80:    shippingCity: "",
+81:    notes: "",
+82:  });
+84:  // Use exchange rate from API, default to 420 if not loaded yet
+85:  const [currentRate, setCurrentRate] = useState<number>(420);
+86:  // Allow manual override of the rate
+87:  const [manualRate, setManualRate] = useState<string>("");
+89:  // Update rate when API data is available
+90:  useEffect(() => {
+91:    if (exchangeRate && !manualRate) {
+92:      setCurrentRate(exchangeRate);
+93:    }
+94:  }, [exchangeRate, manualRate]);
+96:  // Use manual rate if set, otherwise use API rate
+97:  const effectiveRate = manualRate
+98:    ? Number.parseFloat(manualRate)
+99:    : currentRate;
+101:  const [ordersInPackage, setOrdersInPackage] = useState("4");
+102:  const [products, setProducts] = useState<ProductItem[]>([
+103:    {
+104:      id: "1",
+105:      name: "",
+106:      url: "",
+107:      price: "",
+108:      quantity: 1,
+109:      weight: "",
+110:      store: "",
+111:    },
+112:  ]);
+114:  const [priceBreakdown, setPriceBreakdown] = useState<any>(null);
+116:  const handleChange = (field: string, value: string | number) => {
+117:    setFormData((prev) => ({ ...prev, [field]: value }));
+118:    setPriceBreakdown(null);
+119:  };
+121:  const handleOrdersInPackageChange = (value: string) => {
+122:    setOrdersInPackage(value);
+123:    setPriceBreakdown(null);
+124:  };
+126:  const addProduct = () => {
+127:    const newProduct: ProductItem = {
+128:      id: Date.now().toString(),
+129:      name: "",
+130:      url: "",
+131:      price: "",
+132:      quantity: 1,
+133:      weight: "",
+134:      store: "",
+135:    };
+136:    setProducts([...products, newProduct]);
+137:  };
+139:  const removeProduct = (id: string) => {
+140:    if (products.length > 1) {
+141:      setProducts(products.filter((p) => p.id !== id));
+142:      setPriceBreakdown(null);
+143:    }
+144:  };
+146:  const updateProduct = (
+147:    id: string,
+148:    field: keyof ProductItem,
+149:    value: string | number
+150:  ) => {
+151:    setProducts(
+152:      products.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+153:    );
+154:    setPriceBreakdown(null);
+155:  };
+157:  const calculatePrice = () => {
+158:    let totalProductUSD = 0;
+159:    let totalWeight = 0;
+161:    products.forEach((product) => {
+162:      const price = Number.parseFloat(product.price) || 0;
+163:      const qty = product.quantity || 1;
+164:      const weight = Number.parseFloat(product.weight) || 2.0;
+166:      totalProductUSD += price * qty;
+167:      totalWeight += weight * qty;
+168:    });
+170:    const ordersCount = Number.parseInt(ordersInPackage) || 4;
+171:    const baseShipping = 10 / ordersCount;
+172:    const weightShipping = totalWeight * 5.5;
+173:    const operationalCost = 5;
+174:    const insuranceRate = 3;
+175:    const insuranceCost = (totalProductUSD * insuranceRate) / 100;
+176:    const platformFee = 2;
+177:    const totalShipping =
+178:      baseShipping + weightShipping + operationalCost + insuranceCost;
+180:    const totalCostUSD = totalProductUSD + totalShipping + platformFee;
+181:    const rate = effectiveRate || 420;
+183:    const commissionPercentage = 20;
+184:    const commissionCUP = totalProductUSD * rate * (commissionPercentage / 100);
+186:    const profitMarginPercentage = 15;
+187:    const profitMarginCUP =
+188:      totalProductUSD * rate * (profitMarginPercentage / 100);
+190:    const finalPriceCUP = totalCostUSD * rate + commissionCUP + profitMarginCUP;
+192:    const initialMargin = profitMarginCUP * 0.5;
+193:    const firstPaymentUSD = totalProductUSD + insuranceCost + platformFee;
+194:    const firstPaymentCUP = firstPaymentUSD * rate + initialMargin;
+196:    const remainingMargin = profitMarginCUP * 0.5;
+197:    const secondPaymentUSD = totalShipping - insuranceCost;
+198:    const secondPaymentCUP =
+199:      secondPaymentUSD * rate + remainingMargin + commissionCUP;
+201:    setPriceBreakdown({
+202:      totalProductUSD,
+203:      totalWeight,
+204:      baseShippingUSD: baseShipping,
+205:      weightShippingUSD: weightShipping,
+206:      totalShippingUSD: totalShipping,
+207:      operationalCost,
+208:      insuranceCost,
+209:      platformFee,
+210:      totalCostUSD,
+211:      exchangeRate: rate,
+212:      commissionPercentage,
+213:      commissionCUP,
+214:      profitMarginPercentage,
+215:      profitMarginCUP,
+216:      finalPriceCUP,
+217:      firstPaymentCUP,
+218:      secondPaymentCUP,
+219:    });
+220:  };
+222:  const handleSave = async () => {
+223:    const orderNumber = `ORD-${Date.now()}`;
+225:    // Prepare order data for Supabase
+226:    const orderData = {
+227:      order_number: orderNumber,
+228:      // Client info - using name as email placeholder since we don't have email field
+229:      client_name: formData.clientName,
+230:      client_email:
+231:        formData.clientName.toLowerCase().replace(/\s+/g, ".") +
+232:        "@client.local",
+233:      client_phone: formData.clientPhone,
+235:      // Shipping - hardcoded for Cuba
+236:      shipping_country: "Cuba",
+237:      shipping_address: formData.shippingAddress,
+238:      shipping_city: formData.shippingCity,
+240:      // Product info - using first product as main (for schema compatibility)
+241:      product_name: products[0]?.name || "Multiple Products",
+242:      product_url: products[0]?.url || "",
+243:      product_quantity: products.reduce(
+244:        (sum, p) => sum + (parseInt(String(p.quantity)) || 0),
+245:        0
+246:      ),
+248:      // Store
+249:      store_name: products[0]?.store || "Otro",
+251:      // Pricing in USD (from priceBreakdown)
+252:      product_price_usd: priceBreakdown?.totalProductUSD || 0,
+253:      shipping_fee_usd:
+254:        (priceBreakdown?.baseShippingUSD || 0) +
+255:        (priceBreakdown?.weightShippingUSD || 0),
+256:      platform_fee_usd: priceBreakdown?.platformFee || 0,
+257:      total_cost_usd:
+258:        (priceBreakdown?.totalProductUSD || 0) +
+259:        ((priceBreakdown?.baseShippingUSD || 0) +
+260:          (priceBreakdown?.weightShippingUSD || 0)) +
+261:        (priceBreakdown?.platformFee || 0),
+263:      // Exchange rate and COP pricing (using CUP data with rate)
+264:      exchange_rate: priceBreakdown?.exchangeRate || 1,
+265:      total_cost_cop:
+266:        (priceBreakdown?.finalPriceCUP || 0) *
+267:        (priceBreakdown?.exchangeRate || 1),
+268:      commission_percentage: 15.0,
+269:      commission_cop:
+270:        (priceBreakdown?.commissionCUP || 0) *
+271:        (priceBreakdown?.exchangeRate || 1),
+272:      profit_margin_percentage: 10.0,
+273:      profit_margin_cop:
+274:        ((priceBreakdown?.finalPriceCUP || 0) -
+275:          (priceBreakdown?.commissionCUP || 0)) *
+276:        (priceBreakdown?.exchangeRate || 1) *
+277:        0.1,
+278:      final_price_cop:
+279:        (priceBreakdown?.finalPriceCUP || 0) *
+280:        (priceBreakdown?.exchangeRate || 1),
+282:      // Payment
+283:      payment_method: "transfer",
+284:      payment_status: "pending",
+285:      amount_paid: 0,
+287:      // Status
+288:      status: "pending",
+290:      // Notes
+291:      client_notes: formData.notes,
+292:      admin_notes: "",
+293:    };
+295:    // Save to Supabase
+296:    const { data, error } = await supabase
+297:      .from("orders")
+298:      .insert([orderData])
+299:      .select();
+301:    if (error) {
+302:      console.error("Error saving order to Supabase:", error);
+303:      console.error("Error details:", JSON.stringify(error, null, 2));
+305:      // More user-friendly error message
+306:      if (error.message.includes('relation "orders" does not exist')) {
+307:        sileo.error({
+308:          title: "Error al guardar el pedido: ",
+309:          description:
+310:            "La tabla de pedidos no existe en la base de datos. Por favor, contacta al administrador.",
+311:        });
+312:      } else if (error.message.includes("duplicate key")) {
+313:        sileo.error({
+314:          title: "Error al guardar el pedido: ",
+315:          description:
+316:            "Ya existe un pedido con este número. Por favor intenta de nuevo.",
+317:        });
+318:      } else {
+319:        sileo.error({
+320:          title: "Error al guardar el pedido: ",
+321:          description: error.message,
+322:        });
+323:      }
+324:      return;
+325:    }
+327:    // Save order items (products) if we have an order ID
+328:    if (data && data[0]?.id) {
+329:      const orderItems = products.map((product) => ({
+330:        order_id: data[0].id,
+331:        product_name: product.name,
+332:        product_url: product.url,
+333:        product_quantity: parseInt(String(product.quantity)) || 1,
+334:        product_price_usd: parseFloat(String(product.price)) || 0,
+335:      }));
+337:      const { error: itemsError } = await supabase
+338:        .from("order_items")
+339:        .insert(orderItems);
+341:      if (itemsError) {
+342:        console.error("Error saving order items:", itemsError);
+343:      }
+344:    }
+346:    // Show success message
+347:    sileo.success({
+348:      title: "Pedido " + orderNumber + " guardado exitosamente!",
+349:    });
+351:    // Call onSave with local data (for any local state updates)
+352:    onSave({
+353:      ...orderData,
+354:      id: data?.[0]?.id,
+355:    });
+357:    onClose();
+358:    setFormData({
+359:      clientName: "",
+360:      clientPhone: "",
+361:      shippingAddress: "",
+362:      shippingCity: "",
+363:      notes: "",
+364:    });
+365:    setProducts([
+366:      {
+367:        id: "1",
+368:        name: "",
+369:        url: "",
+370:        price: "",
+371:        quantity: 1,
+372:        weight: "",
+373:        store: "",
+374:      },
+375:    ]);
+376:    setPriceBreakdown(null);
+377:  };
+379:  const isFormValid =
+380:    formData.clientName &&
+381:    formData.clientPhone &&
+382:    products.some((p) => p.name && p.price);
+384:  const shippingPerOrder = (
+385:    10 / Number.parseInt(ordersInPackage || "4")
+386:  ).toFixed(2);
+388:  return (
+389:    <Dialog open={isOpen} onOpenChange={onClose}>
+390:      <DialogContent className="w-[98vw] max-w-[98vw] max-h-[98vh] overflow-hidden p-0 bg-white">
+391:        <DialogHeader className="px-6 py-4 border-b bg-white">
+392:          <DialogTitle className="text-2xl font-bold flex items-center gap-3 text-white">
+393:            <div className="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+394:              <Package className="size-5" />
+395:            </div>
+396:            {t("createOrder.title")}
+397:          </DialogTitle>
+398:        </DialogHeader>
+400:        <div className="w-full h-[calc(98vh-200px)] overflow-y-auto px-6 py-4 space-y-4">
+401:          {/* Configuración*/}
+402:          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+403:            <div className="space-y-2">
+404:              <Label
+405:                htmlFor="exchangeRate"
+406:                className="text-sm font-medium text-slate-700 flex items-center gap-2"
+407:              >
+408:                <DollarSign className="size-4 text-primary" />
+409:                {t("createOrder.exchangeRate")}
+410:              </Label>
+411:              <div className="relative">
+412:                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+413:                  1 USD =
+414:                </span>
+415:                <Input
+416:                  id="exchangeRate"
+417:                  type="text"
+418:                  step="0.01"
+419:                  value={
+420:                    manualRate ||
+421:                    (effectiveRate > 0 ? effectiveRate.toString() : "")
+422:                  }
+423:                  onChange={(e) => {
+424:                    setManualRate(e.target.value);
+425:                    setPriceBreakdown(null);
+426:                  }}
+427:                  placeholder="420"
+428:                  className="pl-16 text-slate-500 font-semibold h-10 text-lg"
+429:                />
+430:              </div>
+431:            </div>
+433:            <div className="space-y-2">
+434:              <Label
+435:                htmlFor="ordersInPackage"
+436:                className="text-sm font-medium text-slate-700 flex items-center gap-2"
+437:              >
+438:                <Package className="size-4 text-primary" />
+439:                {t("createOrder.ordersPerPackage")}
+440:              </Label>
+441:              <Input
+442:                id="ordersInPackage"
+443:                type="number"
+444:                min="1"
+445:                max="10"
+446:                value={ordersInPackage}
+447:                onChange={(e) => handleOrdersInPackageChange(e.target.value)}
+448:                className="font-semibold h-10 text-lg"
+449:              />
+450:            </div>
+451:          </div>
+453:          <div className="flex items-center justify-between w-full">
+454:            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg w-full">
+455:              <p className="text-sm text-green-400 font-medium">
+456:                📦 $10 ÷ {ordersInPackage} = ${shippingPerOrder} USD/
+457:                {t("createOrder.ordersPerPackage").toLowerCase()}
+458:              </p>
+459:            </div>
+460:          </div>
+462:          {/* Client & Products - Full Width Maximizado */}
+463:          <div className="grid grid-cols-1 gap-6 w-full">
+464:            {/* Client Info - Full Width */}
+465:            <div className="backdrop-blur-sm border rounded-xl p-5">
+466:              <h3 className="font-semibold mb-4 flex items-center gap-2 text-lg">
+467:                <User className="size-5 text-primary" />
+468:                {t("createOrder.client")}
+469:              </h3>
+471:              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+472:                <div className="space-y-1">
+473:                  <Label
+474:                    htmlFor="clientName"
+475:                    className="text-sm text-slate-400"
+476:                  >
+477:                    {t("createOrder.clientName")} *
+478:                  </Label>
+479:                  <Input
+480:                    id="clientName"
+481:                    value={formData.clientName}
+482:                    onChange={(e) => handleChange("clientName", e.target.value)}
+483:                    placeholder={t("createOrder.clientName")}
+484:                    className="h-10 text-base"
+485:                  />
+486:                </div>
+488:                <div className="space-y-1">
+489:                  <Label
+490:                    htmlFor="clientPhone"
+491:                    className="text-sm text-slate-400"
+492:                  >
+493:                    {t("createOrder.clientPhone")} *
+494:                  </Label>
+495:                  <Input
+496:                    id="clientPhone"
+497:                    value={formData.clientPhone}
+498:                    onChange={(e) =>
+499:                      handleChange("clientPhone", e.target.value)
+500:                    }
+501:                    placeholder="+53 5xxx xxxx"
+502:                    className="h-10 text-base"
+503:                  />
+504:                </div>
+506:                <div className="col-span-full space-y-1">
+507:                  <Label
+508:                    htmlFor="shippingAddress"
+509:                    className="text-sm text-slate-400"
+510:                  >
+511:                    {t("createOrder.address")}
+512:                  </Label>
+513:                  <Input
+514:                    id="shippingAddress"
+515:                    value={formData.shippingAddress}
+516:                    onChange={(e) =>
+517:                      handleChange("shippingAddress", e.target.value)
+518:                    }
+519:                    placeholder={t("createOrder.address")}
+520:                    className="h-10 text-base"
+521:                  />
+522:                </div>
+524:                <div className="col-span-full space-y-1">
+525:                  <Label
+526:                    htmlFor="shippingCity"
+527:                    className="text-sm text-slate-400"
+528:                  >
+529:                    {t("createOrder.city")}
+530:                  </Label>
+531:                  <Input
+532:                    id="shippingCity"
+533:                    value={formData.shippingCity}
+534:                    onChange={(e) =>
+535:                      handleChange("shippingCity", e.target.value)
+536:                    }
+537:                    placeholder={t("createOrder.city")}
+538:                    className="h-10 text-base"
+539:                  />
+540:                </div>
+541:              </div>
+542:            </div>
+544:            {/* Products */}
+545:            <div className="backdrop-blur-sm border rounded-xl p-5">
+546:              <div className="flex items-center justify-between mb-4">
+547:                <h3 className="font-semibold flex items-center gap-2 text-lg">
+548:                  <ShoppingCart className="size-5 text-primary" />
+549:                  {t("createOrder.products")} ({products.length})
+550:                </h3>
+551:                <Button
+552:                  type="button"
+553:                  onClick={addProduct}
+554:                  className="h-9 px-4 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/50 text-sm"
+555:                >
+556:                  <Plus className="size-4 mr-2" />
+557:                  {t("createOrder.addProduct")}
+558:                </Button>
+559:              </div>
+561:              <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 -mr-2">
+562:                {products.map((product, index) => (
+563:                  <div
+564:                    key={product.id}
+565:                    className="border border-slate-300 rounded-xl p-4"
+566:                  >
+567:                    <div className="flex items-center justify-between mb-3">
+568:                      <span className="text-sm font-medium text-primary">
+569:                        {t("createOrder.products")} #{index + 1}
+570:                      </span>
+571:                      {products.length > 1 && (
+572:                        <Button
+573:                          type="button"
+574:                          onClick={() => removeProduct(product.id)}
+575:                          className="h-8 w-8 p-0 bg-red-500/20 hover:bg-red-500/40 text-red-400 border-0"
+576:                        >
+577:                          <X className="size-4" />
+578:                        </Button>
+579:                      )}
+580:                    </div>
+582:                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+583:                      {/* Nombre del producto */}
+584:                      <div className="md:col-span-5 space-y-1">
+585:                        <Input
+586:                          value={product.name}
+587:                          onChange={(e) =>
+588:                            updateProduct(product.id, "name", e.target.value)
+589:                          }
+590:                          placeholder={t("createOrder.productName")}
+591:                          className="text-base h-10"
+592:                        />
+593:                      </div>
+595:                      {/* Fila de campos secundarios */}
+596:                      <div className="md:col-span-1 space-y-1">
+597:                        <div className="relative">
+598:                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+599:                            $
+600:                          </span>
+601:                          <Input
+602:                            type="number"
+603:                            step="0.01"
+604:                            value={product.price}
+605:                            onChange={(e) =>
+606:                              updateProduct(product.id, "price", e.target.value)
+607:                            }
+608:                            placeholder={t("createOrder.productPrice")}
+609:                            className="pl-8 text-base h-10"
+610:                          />
+611:                        </div>
+612:                      </div>
+614:                      <div className="md:col-span-1 space-y-1">
+615:                        <Input
+616:                          type="number"
+617:                          min="1"
+618:                          value={product.quantity}
+619:                          onChange={(e) =>
+620:                            updateProduct(
+621:                              product.id,
+622:                              "quantity",
+623:                              Number.parseInt(e.target.value) || 1
+624:                            )
+625:                          }
+626:                          placeholder={t("createOrder.productQuantity")}
+627:                          className="text-base h-10 "
+628:                        />
+629:                      </div>
+631:                      <div className="md:col-span-1 space-y-1">
+632:                        <Input
+633:                          type="number"
+634:                          step="0.1"
+635:                          value={product.weight}
+636:                          onChange={(e) =>
+637:                            updateProduct(product.id, "weight", e.target.value)
+638:                          }
+639:                          placeholder={t("createOrder.productWeight")}
+640:                          className="text-base h-10"
+641:                        />
+642:                      </div>
+644:                      {/* Store */}
+645:                      <div className="md:col-span-1 space-y-1">
+646:                        <Select
+647:                          value={product.store}
+648:                          onValueChange={(value) =>
+649:                            updateProduct(product.id, "store", value)
+650:                          }
+651:                        >
+652:                          <SelectTrigger className="text-base h-10">
+653:                            <SelectValue
+654:                              placeholder={t("createOrder.selectStore")}
+655:                            />
+656:                          </SelectTrigger>
+657:                          <SelectContent className="bg-slate-800 border-slate-700">
+658:                            <SelectItem
+659:                              value="Temu"
+660:                              className="text-white text-base py-2"
+661:                            >
+662:                              <TemuIcon className="w-4 h-4 inline mr-2" />
+663:                              {t("createOrder.temu")}
+664:                            </SelectItem>
+665:                            <SelectItem
+666:                              value="Shein"
+667:                              className="text-white text-base py-2"
+668:                            >
+669:                              <SheinIcon className="w-4 h-4 inline mr-2" />
+670:                              {t("createOrder.shein")}
+671:                            </SelectItem>
+672:                            <SelectItem
+673:                              value="Amazon"
+674:                              className="text-white text-base py-2"
+675:                            >
+676:                              <AmazonIcon className="w-4 h-4 inline mr-2" />
+677:                              {t("createOrder.amazon")}
+678:                            </SelectItem>
+679:                            <SelectItem
+680:                              value="Otro"
+681:                              className="text-white text-base py-2"
+682:                            >
+683:                              {t("createOrder.other")}
+684:                            </SelectItem>
+685:                          </SelectContent>
+686:                        </Select>
+687:                      </div>
+689:                      {/* URL*/}
+690:                      <div className="md:col-span-5 space-y-1">
+691:                        <Input
+692:                          value={product.url}
+693:                          onChange={(e) =>
+694:                            updateProduct(product.id, "url", e.target.value)
+695:                          }
+696:                          placeholder={t("createOrder.productUrl")}
+697:                          className="text-base h-10 font-mono"
+698:                        />
+699:                      </div>
+701:                      {/* Notes */}
+702:                      <div className="md:col-span-5 space-y-1">
+703:                        <Textarea
+704:                          id="notes"
+705:                          value={formData.notes}
+706:                          onChange={(e) =>
+707:                            handleChange("notes", e.target.value)
+708:                          }
+709:                          placeholder={t("createOrder.notes")}
+710:                          rows={3}
+711:                          className="resize-none text-base h-24"
+712:                        />
+713:                      </div>
+714:                    </div>
+715:                  </div>
+716:                ))}
+717:              </div>
+718:            </div>
+719:          </div>
+721:          {/* Prices */}
+722:          <div className="backdrop-blur-sm border rounded-xl p-5">
+723:            <div className="flex items-center justify-between mb-5">
+724:              <h3 className="font-semibold flex items-center gap-2 text-lg">
+725:                <Calculator className="size-5 text-primary" />
+726:                {t("createOrder.paymentSystem")}
+727:              </h3>
+728:              <Button
+729:                onClick={calculatePrice}
+730:                disabled={!products.some((p) => p.price)}
+731:                className="h-10 px-6 bg-gradient-to-r from-primary to-orange-400 hover:from-primary/90 text-white text-base"
+732:              >
+733:                <Calculator className="size-5 mr-2" />
+734:                {t("createOrder.calculate")}
+735:              </Button>
+736:            </div>
+738:            {priceBreakdown && (
+739:              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+740:                {/* Primer Pago */}
+741:                <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5">
+742:                  <h4 className="font-semibold text-blue-400 mb-3 text-base">
+743:                    {t("createOrder.firstPayment")}
+744:                  </h4>
+745:                  <p className="text-sm text-slate-500 mb-4">
+746:                    {t("createOrder.firstPaymentDesc")}
+747:                  </p>
+748:                  <div className="space-y-2 text-base text-slate-700">
+749:                    <div className="flex justify-between py-2 border-b border-blue-500/20">
+750:                      <span>{t("createOrder.productCost")}:</span>
+751:                      <span className="font-medium">
+752:                        ${priceBreakdown.totalProductUSD.toFixed(2)}
+753:                      </span>
+754:                    </div>
+755:                    <div className="flex justify-between py-2 border-b border-blue-500/20">
+756:                      <span>{t("createOrder.insurance")}:</span>
+757:                      <span className="font-medium">
+758:                        ${priceBreakdown.insuranceCost.toFixed(2)}
+759:                      </span>
+760:                    </div>
+761:                    <div className="flex justify-between py-2 border-b border-blue-500/20">
+762:                      <span>{t("createOrder.platformFee")}:</span>
+763:                      <span className="font-medium">
+764:                        ${priceBreakdown.platformFee.toFixed(2)}
+765:                      </span>
+766:                    </div>
+767:                    <div className="flex justify-between pt-3 font-bold text-blue-400 text-lg">
+768:                      <span>{t("createOrder.total")}:</span>
+769:                      <span className="font-extrabold">
+770:                        $
+771:                        {priceBreakdown.firstPaymentCUP.toLocaleString("es-CU")}{" "}
+772:                        CUP
+773:                      </span>
+774:                    </div>
+775:                  </div>
+776:                </div>
+778:                {/* Segundo Pago */}
+779:                <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5">
+780:                  <h4 className="font-semibold text-green-400 mb-3 text-base">
+781:                    {t("createOrder.secondPayment")}
+782:                  </h4>
+783:                  <p className="text-sm text-slate-500 mb-4">
+784:                    {t("createOrder.secondPaymentDesc")}
+785:                  </p>
+786:                  <div className="space-y-2 text-base text-slate-700">
+787:                    <div className="flex justify-between py-2 border-b border-green-500/20">
+788:                      <span>{t("createOrder.shippingBase")}:</span>
+789:                      <span className="font-medium">
+790:                        ${priceBreakdown.baseShippingUSD.toFixed(2)}
+791:                      </span>
+792:                    </div>
+793:                    <div className="flex justify-between py-2 border-b border-green-500/20">
+794:                      <span>
+795:                        {t("createOrder.weightCost")} (
+796:                        {priceBreakdown.totalWeight.toFixed(1)} lb):
+797:                      </span>
+798:                      <span className="font-medium">
+799:                        ${priceBreakdown.weightShippingUSD.toFixed(2)}
+800:                      </span>
+801:                    </div>
+802:                    <div className="flex justify-between py-2 border-b border-green-500/20">
+803:                      <span>{t("createOrder.operational")}:</span>
+804:                      <span className="font-medium">
+805:                        ${priceBreakdown.operationalCost.toFixed(2)}
+806:                      </span>
+807:                    </div>
+808:                    <div className="flex justify-between py-2 border-b border-green-500/20">
+809:                      <span>{t("createOrder.commission")}:</span>
+810:                      <span className="font-medium">
+811:                        ${priceBreakdown.commissionCUP.toLocaleString("es-CU")}{" "}
+812:                        CUP
+813:                      </span>
+814:                    </div>
+815:                    <div className="flex justify-between pt-3 font-bold text-green-400 text-lg">
+816:                      <span>{t("createOrder.total")}:</span>
+817:                      <span className="font-extrabold">
+818:                        $
+819:                        {priceBreakdown.secondPaymentCUP.toLocaleString(
+820:                          "es-CU"
+821:                        )}{" "}
+822:                        CUP
+823:                      </span>
+824:                    </div>
+825:                    <p className="text-sm text-slate-500 mt-3 italic">
+826:                      {t("createOrder.recalculateWarning")}
+827:                    </p>
+828:                  </div>
+829:                </div>
+831:                {/* Total */}
+832:                <div className="bg-gradient-to-br from-primary/20 to-orange-500/20 border-2 border-primary/50 rounded-xl p-5 flex flex-col justify-center">
+833:                  <div className="text-center">
+834:                    <span className="text-base text-slate-600">
+835:                      {t("createOrder.total")}
+836:                    </span>
+837:                    <div className="text-4xl font-extrabold text-primary mt-2">
+838:                      $
+839:                      {(
+840:                        priceBreakdown.firstPaymentCUP +
+841:                        priceBreakdown.secondPaymentCUP
+842:                      ).toLocaleString("es-CU")}
+843:                    </div>
+844:                    <div className="text-xl text-green-400 font-bold mt-1">
+845:                      {t("createOrder.totalCUP")}
+846:                    </div>
+847:                    <div className="text-base text-slate-700 mt-3">
+848:                      ≈ $
+849:                      {(
+850:                        (priceBreakdown.firstPaymentCUP +
+851:                          priceBreakdown.secondPaymentCUP) /
+852:                        priceBreakdown.exchangeRate
+853:                      ).toFixed(2)}{" "}
+854:                      USD
+855:                    </div>
+856:                  </div>
+857:                </div>
+858:              </div>
+859:            )}
+860:          </div>
+862:          {/* Save Button  */}
+863:          <Button
+864:            onClick={handleSave}
+865:            disabled={!isFormValid || !priceBreakdown}
+866:            className="w-full h-16 text-lg font-bold text-white bg-gradient-to-r from-green-900 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+867:          >
+868:            <Save className="size-6 mr-3" />
+869:            {t("createOrder.saveOrder")}
+870:          </Button>
+871:        </div>
+872:      </DialogContent>
+873:    </Dialog>
+874:  );
+875:}

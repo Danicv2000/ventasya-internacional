@@ -13,9 +13,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
-  },
   // Use webpack instead of turbopack
   turbopack: {},
   webpack: (config, { dev, isServer }) => {

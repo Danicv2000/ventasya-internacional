@@ -89,6 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     setError(null)
 
+    // Check if Supabase is configured
+    if (!supabase || !isSupabaseConfigured()) {
+      const errorMsg = 'Supabase no está configurado. Configura las variables de entorno.'
+      logDebug('Login exception:', errorMsg)
+      setError(errorMsg)
+      setIsLoading(false)
+      return { success: false, error: errorMsg }
+    }
+
     try {
       const { data, error } = await supabase!.auth.signInWithPassword({
         email: credentials.email,
@@ -133,6 +142,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     setError(null)
 
+    if (!supabase || !isSupabaseConfigured()) {
+      logDebug('Logout skipped: Supabase not configured')
+      setUser(null)
+      setSession(null)
+      setIsAuthenticated(false)
+      setIsLoading(false)
+      return
+    }
+
     try {
       const { error } = await supabase!.auth.signOut()
       
@@ -159,6 +177,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsLoading(true)
     setError(null)
+
+    if (!supabase || !isSupabaseConfigured()) {
+      const errorMsg = 'Supabase no está configurado. Configura las variables de entorno.'
+      logDebug('Sign up exception:', errorMsg)
+      setError(errorMsg)
+      setIsLoading(false)
+      return { success: false, error: errorMsg }
+    }
 
     try {
       const { data, error } = await supabase!.auth.signUp({

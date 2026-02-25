@@ -49,9 +49,13 @@ jobs:
       - name: Create .env.local with secrets
         run: |
           echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > .env.local
+          echo "NEXT_PUBLIC_SUPABASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}" > .env.local
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
-          echo "ENVIROMENT=${{ secrets.ENVIROMENT }}" >> .env.local
+          echo "NEXT_PUBLIC_SUPABASE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_KEY }}" >> .env.local
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{secrets.SUPABASE_SERVICE_ROLE_KEY}}" >> .env.local
           echo "NEXT_PUBLIC_BASE_PATH=${{ secrets.NEXT_PUBLIC_BASE_PATH }}" >> .env.local
+          echo "ENVIROMENT=${{ secrets.ENVIROMENT }}" >> .env.local
+          echo "NEXT_PUBLIC_ELTOQUE_API_TOKEN=${{secrets.NEXT_PUBLIC_ELTOQUE_API_TOKEN}}" >> .env.local
           echo ".env.local created with secrets"
           cat .env.local
 

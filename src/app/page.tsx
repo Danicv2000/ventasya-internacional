@@ -1,8 +1,6 @@
-"use client";
-
-import LandingPage from "@/src/core/components/landing-page";
+import ServerLandingPage from "@/src/features/common/server-landing-page";
 
 export default function HomePage() {
-  // Using the new landing page component
-  return <LandingPage />;
+  // Using the server component that pre-fetches data
+  return <ServerLandingPage />;
 }

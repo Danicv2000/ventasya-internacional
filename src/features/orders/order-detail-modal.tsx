@@ -10,6 +10,7 @@ import { Input } from "@/src/shared/ui/input"
 import { useState } from "react"
 import { Package, MapPin, DollarSign } from "lucide-react"
 import { TemuIcon, SheinIcon, AmazonIcon } from '@/src/features/common/platform-icons'
+import { sileo } from "sileo"
 
 interface Order {
   id: string
@@ -44,17 +45,7 @@ export function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
   const [adminNotes, setAdminNotes] = useState("")
 
   const handleSave = () => {
-    console.log("[v0] Updating order:", { 
-      orderId: order.id, 
-      status, 
-      paymentStatus, 
-      firstPaymentStatus,
-      secondPaymentStatus,
-      actualWeight: actualWeight ? Number.parseFloat(actualWeight) : null,
-      adminNotes 
-    })
-    // In production, this would call an API
-    alert("Pedido actualizado exitosamente")
+    sileo.success({ title: 'Pedido actualizado correctamente' })
     onClose()
   }
 

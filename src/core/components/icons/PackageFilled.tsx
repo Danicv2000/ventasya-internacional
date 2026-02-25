@@ -1,0 +1,33 @@
+import React from "react";
+
+// Definimos tipos para las props
+interface PackageFilledProps extends React.SVGProps<SVGSVGElement> {
+  size?: number | string;
+  color?: string;
+}
+
+export const PackageFilled: React.FC<PackageFilledProps> = ({
+  size = 30,
+  color = "oklch(0.55 0.22 250)",
+  viewBox = "0 0 24 24",
+  className = "",
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 512 512"
+      className={className}
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M64 173.836v188.83l170.667 94.815V268.557zm213.333 283.645L448 362.666v-188.92l-170.667 94.806zm-84.03-379.087l62.702-34.8l169.367 93.914l-62.712 34.837zm-43.967 24.401l169.377 93.963l-62.717 34.839l-169.367-93.999z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};

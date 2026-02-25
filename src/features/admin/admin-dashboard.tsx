@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/src/shared/ui/card"
 import { Button } from "@/src/shared/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/shared/ui/tabs"
@@ -11,98 +11,123 @@ import { CreateOrderModal } from "@/src/features/orders/create-order-modal"
 import { CalculationSettings } from "@/src/features/calculator/calculation-settings"
 import { ConsolidatedShipping } from "@/src/features/tracking/consolidated-shipping"
 import { useAuth } from "@/src/core/contexts/auth-context"
+import { sileo } from "sileo"
+import { supabase } from "@/src/lib/supabase-client"
 import Link from "next/link"
 
-// Mock data - In production this would come from API
-const mockOrders = [
-  {
-    id: "1",
-    orderNumber: "ORD-2024-001",
-    clientName: "María González",
-    clientEmail: "maria@example.com",
-    productName: "Vestido de verano floral",
-    storeName: "Shein",
-    finalPriceCUP: 134375,
-    firstPaymentCUP: 84000,
-    secondPaymentCUP: 50375,
-    status: "in_transit",
-    paymentStatus: "first_paid",
-    firstPaymentStatus: "paid",
-    secondPaymentStatus: "pending",
-    estimatedWeightLbs: 1.5,
-    actualWeightLbs: 1.8,
-    createdAt: new Date("2024-01-15"),
-  },
-  {
-    id: "2",
-    orderNumber: "ORD-2024-002",
-    clientName: "Carlos Rodríguez",
-    clientEmail: "carlos@example.com",
-    productName: "Audífonos Bluetooth",
-    storeName: "Temu",
-    finalPriceCUP: 188125,
-    firstPaymentCUP: 126000,
-    secondPaymentCUP: 62125,
-    status: "confirmed",
-    paymentStatus: "pending",
-    firstPaymentStatus: "pending",
-    secondPaymentStatus: "pending",
-    estimatedWeightLbs: 0.8,
-    actualWeightLbs: 0.8,
-    createdAt: new Date("2024-01-16"),
-  },
-  {
-    id: "3",
-    orderNumber: "ORD-2024-003",
-    clientName: "Ana Martínez",
-    clientEmail: "ana@example.com",
-    productName: "Reloj inteligente",
-    storeName: "Amazon",
-    finalPriceCUP: 425000,
-    firstPaymentCUP: 315000,
-    secondPaymentCUP: 110000,
-    status: "delivered",
-    paymentStatus: "paid",
-    firstPaymentStatus: "paid",
-    secondPaymentStatus: "paid",
-    estimatedWeightLbs: 2.0,
-    actualWeightLbs: 2.2,
-    createdAt: new Date("2024-01-10"),
-  },
-  {
-    id: "4",
-    orderNumber: "ORD-2024-004",
-    clientName: "Luis Hernández",
-    clientEmail: "luis@example.com",
-    productName: "Zapatillas deportivas",
-    storeName: "Temu",
-    finalPriceCUP: 215000,
-    firstPaymentCUP: 147000,
-    secondPaymentCUP: 68000,
-    status: "pending",
-    paymentStatus: "pending",
-    firstPaymentStatus: "pending",
-    secondPaymentStatus: "pending",
-    estimatedWeightLbs: 2.5,
-    actualWeightLbs: 2.5,
-    createdAt: new Date("2024-01-17"),
-  },
-]
+// Type for orders from Supabase
+interface OrderFromDB {
+  id: string
+  order_number: string
+  client_id: string | null
+  manager_id: string | null
+  status: string
+  total_amount: number
+  shipping_cost: number
+  profit_margin: number
+  currency: string
+  items: any[]
+  created_at: string
+  updated_at: string
+  admin_notes: string | null
+  amount_paid: number
+}
+
+// Type for local order display (compatible with existing components)
+interface LocalOrder {
+  id: string
+  orderNumber: string
+  clientName: string
+  clientEmail: string
+  productName: string
+  storeName: string
+  finalPriceCUP: number
+  firstPaymentCUP: number
+  secondPaymentCUP: number
+  status: string
+  paymentStatus: string
+  firstPaymentStatus: string
+  secondPaymentStatus: string
+  estimatedWeightLbs: number
+  actualWeightLbs: number
+  createdAt: Date
+}
 
 export function AdminDashboard() {
-  const [selectedOrder, setSelectedOrder] = useState<(typeof mockOrders)[0] | null>(null)
+  const [orders, setOrders] = useState<LocalOrder[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedOrder, setSelectedOrder] = useState<LocalOrder | null>(null)
   const [isCreatingOrder, setIsCreatingOrder] = useState(false)
   const { logout } = useAuth()
 
+  // Fetch orders from Supabase
+  useEffect(() => {
+    fetchOrders()
+  }, [])
+
+  const fetchOrders = async () => {
+    try {
+      // Fetch orders with client info
+      const { data: ordersData, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching orders:', error)
+        sileo.error({ title: 'Error al cargar pedidos' })
+        return
+      }
+
+      // Fetch all clients
+      const { data: clientsData } = await supabase
+        .from('clients')
+        .select('*')
+
+      // Create a map for quick client lookup
+      const clientsMap = new Map((clientsData || []).map(c => [c.id, c]))
+
+      // Transform data to local format
+      const transformedOrders: LocalOrder[] = (ordersData || []).map((order: OrderFromDB) => {
+        const client = order.client_id ? clientsMap.get(order.client_id) : null
+        return {
+          id: order.id,
+          orderNumber: order.order_number,
+          clientName: client?.full_name || 'Cliente',
+          clientEmail: client?.email || 'cliente@email.com',
+          productName: order.items?.[0]?.name || 'Producto',
+          storeName: order.items?.[0]?.store || 'Otro',
+          finalPriceCUP: (order.total_amount || 0) * (order.items?.[0]?.price || 1),
+          firstPaymentCUP: (order.total_amount || 0) * 0.6,
+          secondPaymentCUP: (order.total_amount || 0) * 0.4,
+          status: order.status,
+          paymentStatus: order.amount_paid > 0 ? 'partial' : 'pending',
+          firstPaymentStatus: order.amount_paid > 0 ? 'paid' : 'pending',
+          secondPaymentStatus: 'pending',
+          estimatedWeightLbs: 2,
+          actualWeightLbs: 2,
+          createdAt: new Date(order.created_at),
+        }
+      })
+
+      setOrders(transformedOrders)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Calculate stats
-  const totalOrders = mockOrders.length
-  const totalRevenue = mockOrders.reduce((sum, order) => sum + order.finalPriceCUP, 0)
-  const pendingOrders = mockOrders.filter((o) => o.status === "pending" || o.status === "confirmed").length
-  const deliveredOrders = mockOrders.filter((o) => o.status === "delivered").length
+  const totalOrders = orders.length
+  const totalRevenue = orders.reduce((sum, order) => sum + order.finalPriceCUP, 0)
+  const pendingOrders = orders.filter((o) => o.status === 'pending' || o.status === 'confirmed').length
+  const deliveredOrders = orders.filter((o) => o.status === 'delivered').length
 
   const handleCreateOrder = (orderData: any) => {
-    console.log("[v0] New order created:", orderData)
-    alert("Pedido creado exitosamente")
+    sileo.success({ title: 'Pedido creado exitosamente' })
+    // Refresh orders list
+    fetchOrders()
   }
 
   // SOLUCIÓN: Función puente para manejar la diferencia de tipos entre OrdersTable y el estado local
@@ -241,25 +266,31 @@ export function AdminDashboard() {
                 </div>
 
                 <TabsContent value="all" className="space-y-4">
-                  <OrdersTable orders={mockOrders} onViewOrder={handleViewOrder} />
+                  {loading ? (
+                    <div className="flex items-center justify-center p-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <OrdersTable orders={orders} onViewOrder={handleViewOrder} />
+                  )}
                 </TabsContent>
 
                 <TabsContent value="pending" className="space-y-4">
                   <OrdersTable
-                    orders={mockOrders.filter((o) => o.status === "pending" || o.status === "confirmed")}
+                    orders={orders.filter((o) => o.status === "pending" || o.status === "confirmed")}
                     onViewOrder={handleViewOrder}
                   />
                 </TabsContent>
 
                 <TabsContent value="in_transit" className="space-y-4">
                   <OrdersTable
-                    orders={mockOrders.filter((o) => o.status === "in_transit")}
+                    orders={orders.filter((o) => o.status === "in_transit")}
                     onViewOrder={handleViewOrder}
                   />
                 </TabsContent>
 
                 <TabsContent value="delivered" className="space-y-4">
-                  <OrdersTable orders={mockOrders.filter((o) => o.status === "delivered")} onViewOrder={handleViewOrder} />
+                  <OrdersTable orders={orders.filter((o) => o.status === "delivered")} onViewOrder={handleViewOrder} />
                 </TabsContent>
               </Tabs>
             </TabsContent>

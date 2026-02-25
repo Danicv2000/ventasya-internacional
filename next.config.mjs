@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  //output: 'export',
-  //distDir: 'out',
+  // output: 'export', // Removed to allow dynamic API routes
+  distDir: 'out',
   basePath: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional' : '',
   assetPrefix: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional/' : '',
   trailingSlash: process.env.ENVIROMENTS === 'test' ? true : false,
@@ -12,6 +12,9 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
   // Use webpack instead of turbopack
   turbopack: {},

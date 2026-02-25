@@ -7,10 +7,12 @@ import { ShippingProvider } from '@/src/core/contexts/shipping-context';
 
 export function ClientWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <ShippingProvider>
-        {children}
-      </ShippingProvider>
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <ShippingProvider>
+          {children}
+        </ShippingProvider>
+      </AuthProvider>
+    </I18nProvider>
   );
 }

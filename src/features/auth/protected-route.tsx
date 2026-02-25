@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/src/core/contexts/auth-context"
-import { AdminLogin } from "../admin/admin-login"
+import Login from "./login"
 
 
 interface ProtectedRouteProps {
@@ -13,7 +13,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return (
-      <AdminLogin 
+      <Login 
         onLogin={login}
         onSignUp={signUp}
         error={error || undefined}

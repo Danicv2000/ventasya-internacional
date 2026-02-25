@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import {
@@ -18,56 +18,55 @@ import {
   Star,
   ShieldCheck,
   AlertTriangle,
+  PackageCheckIcon,
 } from "lucide-react";
 import { useI18n } from "@/src/shared/hooks/use-i18n";
+import { useExchangeRate } from "@/src/shared/hooks/use-exchange-rate";
 import { Logo } from "./icons/Logo";
 import { PeopleGroup } from "./icons/PeopleGroup";
 import { Mail } from "./icons/Mail";
+import Link from "next/link";
+import { VolunteerActivism } from "./icons/VolunteerActivism";
+import { PackageFilled } from "./icons/PackageFilled";
+import { LocationFilled } from "./icons/LocationFilled";
 
-export default function LandingPage() {
+interface LandingPageProps {
+  initialExchangeRates?: any;
+}
+
+export default function LandingPage({
+  initialExchangeRates,
+}: LandingPageProps = {}) {
+  return (
+    <LandingPageContent initialExchangeRates={initialExchangeRates} />
+  );
+}
+
+function LandingPageContent({
+  initialExchangeRates,
+}: LandingPageProps = {}) {
   const { t } = useI18n();
   const [packageWeight, setPackageWeight] = useState(1.0);
   const [itemValue, setItemValue] = useState("");
   const [selectedStore, setSelectedStore] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash-usd");
 
+  const colors = {
+    primary: "#fb7e51",
+    "background-light": "#f8f6f5",
+    "background-dark": "#23140f",
+    "electric-blue": "#e0f2fe",
+  };
+
+  // Use exchange rate from API (with fallback to initial data for SSR)
+  const { exchangeRate, exchangeRates, loading: tasasLoading, calculateTotalCost } = useExchangeRate({
+    fallbackRate: initialExchangeRates?.tasas?.USD || 420
+  });
+
+  // Use the shared calculation function from hook
   const calculateTotal = () => {
     const price = parseFloat(itemValue) || 0;
-
-    // Paso 1: Precio base (Precio del producto * 1.5 si price es menor a 15 sino producto * 2.0)
-    const baseCost = price <= 15 ? price * 2.0 : price * 1.5;
-
-    /*
-     * Paso 2: Lógica del 20% solo para transferencias y tasa de cambio para pagos en CUP
-     *
-     * - Evalua si el metodo de pago seleccionado es en cup sino devuelve el el precio base
-     * - Evalua si el metodo de pago es transferencia por cup y aplica la formula:
-     *    precio base * tasa de conversion + 20% 
-     * - Si es pago en cup aplica la formula:
-     *    precio base * tasa de conversion
-     */
-    let fee = 0;
-    let total = 0;
-    const packageWeightCost = packageWeight * 10;
-
-    if (paymentMethod.includes("cup")) {
-      let cost = (baseCost + packageWeight) * 490;
-      if (paymentMethod === "transfer-cup") {
-        fee =  baseCost * 490 * 0.2;
-      } else if (paymentMethod === "cash-cup") {
-        fee = 0;
-      }
-      total = cost + fee;
-    } else {
-      total = baseCost + packageWeightCost;
-    }
-
-    // console.log("price: " + price)
-    // console.log("baseCost: " + baseCost)
-    // console.log("fee: " + fee)
-    // console.log("total: " + total)
-
-    return total.toFixed(2);
+    return calculateTotalCost(price, packageWeight, paymentMethod).toFixed(2);
   };
 
   return (
@@ -108,9 +107,11 @@ export default function LandingPage() {
             </a>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="px-4 py-2 text-sm font-bold">
-              Iniciar Sesión
-            </Button>
+            <Link href="/login">
+              <Button variant="outline" className="px-4 py-2 text-sm font-bold">
+                Iniciar Sesión
+              </Button>
+            </Link>
             <Button className="px-5 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-primary/20">
               Registrarse
             </Button>
@@ -261,6 +262,14 @@ export default function LandingPage() {
                           </span>
                         </div>
                       </SelectItem>
+                      <SelectItem value="cash-euro">
+                        <div className="flex items-center gap-2">
+                          <span>Efectivo / EURO</span>
+                          <span className="text-xs text-green-600 font-normal">
+                            (Sin Fee)
+                          </span>
+                        </div>
+                      </SelectItem>
                       <SelectItem value="cash-cup">
                         <div className="flex items-center gap-2">
                           <span>Efectivo / CUP</span>
@@ -289,15 +298,20 @@ export default function LandingPage() {
                     </span>
                     <div
                       className="text-primary text-sm"
-                      title="Incluye impuestos y manejo"
+                      title="Tasa de El Toque del mercado informal"
                     >
                       ℹ
                     </div>
                   </div>
                   <div className="text-3xl font-black text-primary">
-                    ${calculateTotal()}{" "}
+                    {paymentMethod.includes("euro") ? "€" : "$"}
+                    {calculateTotal()}{" "}
                     <span className="text-sm font-medium text-slate-custom">
-                      {paymentMethod.includes("cup") ? "CUP" : "USD"}
+                      {paymentMethod.includes("cup")
+                        ? "CUP"
+                        : paymentMethod.includes("eur")
+                        ? "EUR"
+                        : "USD"}
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-custom mt-2 italic">
@@ -428,6 +442,152 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/*<!-- Stats Section -->*/}
+        <section className="px-6 py-12 max-w-[1280px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-2 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 bg-white dark:bg-surface-dark shadow-sm">
+              <div className="flex items-center gap-3 mb-2 text-primary">
+                <span className="material-symbols-outlined text-3xl">
+                  <VolunteerActivism />
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 text-base font-semibold">
+                  Familias felices
+                </p>
+              </div>
+              <div className="flex items-end gap-3">
+                <p className="text-4xl font-extrabold tracking-tight">
+                  10,000+
+                </p>
+                <p className="text-green-600 text-sm font-bold pb-1">
+                  +12% este mes
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 bg-white dark:bg-surface-dark shadow-sm">
+              <div className="flex items-center gap-3 mb-2 text-primary">
+                <span className="material-symbols-outlined text-3xl">
+                  <PackageFilled />
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 text-base font-semibold">
+                  Entregas exitosas
+                </p>
+              </div>
+              <div className="flex items-end gap-3">
+                <p className="text-4xl font-extrabold tracking-tight">25k+</p>
+                <p className="text-green-600 text-sm font-bold pb-1">
+                  +18% este mes
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 bg-white dark:bg-surface-dark shadow-sm">
+              <div className="flex items-center gap-3 mb-2 text-primary">
+                <span className="material-symbols-outlined text-3xl">
+                  <LocationFilled />
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 text-base font-semibold">
+                  Provincias cubiertas
+                </p>
+              </div>
+              <div className="flex items-end gap-3">
+                <p className="text-4xl font-extrabold tracking-tight">1</p>
+                <p className="text-slate-500 text-sm font-bold pb-1">
+                  Santiago de Cuba
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/*<!-- Collection Header & Tabs -->*/}
+        <section className="px-6 pt-12 max-w-[1280px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-1">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight mb-2">
+                Colecciones destacadas
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">
+                Lo más pedido esta semana en Cuba
+              </p>
+            </div>
+            <div className="flex gap-8 overflow-x-auto no-scrollbar">
+              <a
+                className="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-3 transition-colors"
+                href="#"
+              >
+                <p className="text-sm font-bold whitespace-nowrap">
+                  Tendencias Shein
+                </p>
+              </a>
+              <a
+                className="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-3 transition-colors"
+                href="#"
+              >
+                <p className="text-sm font-bold whitespace-nowrap">
+                  Lo mejor de Amazon
+                </p>
+              </a>
+              <a
+                className="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-3 transition-colors"
+                href="#"
+              >
+                <p className="text-sm font-bold whitespace-nowrap">
+                  Electrónica
+                </p>
+              </a>
+            </div>
+          </div>
+          {/* Collection Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10">
+            <div className="group cursor-pointer">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-3 bg-slate-100 relative">
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  data-alt="Summer fashion clothes layout"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfW47Y7dYq3pnTNpCsf47IJhLiVoOh9323vidJAjcn6dSE0jsnGqm_lGVLs0UYIfm9yEIxsT7VXodpsXRgcjP7cgmKsP2d-wxcDXOmWkfqx4h9ZjWQKmrQlNN2y59YjaYNflKs28YhxXeWpLQ61i2xaNVJ59JtcculNlQqneJuXA__W0Q56DOhl_3scIkQ8NYXiZiSKECwhfX4dbDvCt5ehKAc5rhqkzBydLeomCH1esg-u5ymHJ7mgR7a9dDVTfgaFVQBfuNkJug"
+                />
+                <span className="absolute top-3 left-3 bg-coral text-white text-[10px] font-black px-2 py-1 rounded-full uppercase">
+                  Hot
+                </span>
+              </div>
+              <h3 className="font-bold text-lg">Moda Verano Shein</h3>
+              <p className="text-slate-500 text-sm">Desde $12.99</p>
+            </div>
+            <div className="group cursor-pointer">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-3 bg-slate-100">
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  data-alt="Stylish running sneakers"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCC8VEA-TTfPAcrZPIsu5-NTxNmmleu6dc9PEZv0IzUPpBlJCl96QIY9tnhN0kwbKGBOvvpLTSrLek7B-6_dj9-NagsqwuFaizzF9XZ461bM6Fx43R8TWZMUEyv0_sigThvJwBjNxG4PG5buurdrhlUfpZF57Rl7HnV8UINhwaCDstl6CZV9cj0yeRGLRcC4EKs7HCQt0U7YQ9V0qv9tkoP1XSs5AI5UYETnzP3jZwFdW58Ct3YjKej_eNcPXxsMqhiX1g9kku9Ho"
+                />
+              </div>
+              <h3 className="font-bold text-lg">Calzado Deportivo</h3>
+              <p className="text-slate-500 text-sm">Amazon Choice</p>
+            </div>
+            <div className="group cursor-pointer">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-3 bg-slate-100">
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  data-alt="Living room furniture and decor"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR951xhvz_4Xk79pW2LZs7otx5lP-NJMkTgqMOO8PyeEBkyCUGYExGqU6O7oYlRqaUQRV1CyymI1y1G3e3qMxJQx7jrLqDAoss3pcn7l1LOKAVPIYvhWDiRohgd0nbjHpcBtcu4epaPbmAxUlcFMnfZgYtxXx_uqjqZJTHLnjkSdBTCqZfFH6aCnsnOCPKOV0aF07_eLSQ3vrTJDmXv30bCzcjeXFl9kiBmCefoUP_GOzX3P9b8JCAcMd_ZBuPLyGgs5dJc9ShZJY"
+                />
+              </div>
+              <h3 className="font-bold text-lg">Hogar y DecoraciÃ³n</h3>
+              <p className="text-slate-500 text-sm">MÃ¡s de 500 items</p>
+            </div>
+            <div className="group cursor-pointer">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-3 bg-slate-100">
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  data-alt="Modern smart watch design"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHTbTpb1kHFW3UiczvRZjFBcntu4ylnvnb9nekQL9rGMPQVVNwR_DsdadAknwR3-qOV5qV-JXrZ5454eTGeeNrycjYmObEwjx4PIgkDEw9hhzNH8eUYlp10jH-vibTkUB2sv2h5OtVZ8ePZ12a-N3kFvBc8ne79BdM-SeXXpUC0q_sqKRSm2ZB6pUFIB42Bu7VocEk1ZBsx_L43nk5k2SXqa8YpqLecxZ8u6X5J0RUdicgKehmb8-gYWotIA9xBukLlqA2wKK6RJg"
+                />
+              </div>
+              <h3 className="font-bold text-lg">Smartwatches</h3>
+              <p className="text-slate-500 text-sm">Electrónica Top</p>
+            </div>
+          </div>
+        </section>
+
         {/* Testimonials */}
         <section className="px-6 lg:px-10 py-24 bg-white dark:bg-background-dark/50">
           <div className="max-w-4xl mx-auto space-y-12">
@@ -509,70 +669,107 @@ export default function LandingPage() {
         </section>
 
         {/* Process Steps */}
-        <section className="px-6 lg:px-10 py-20 bg-primary/5 dark:bg-primary/5 rounded-[2.5rem] my-10 mx-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-black mb-4">
-              {t("process_steps.title")}
-            </h2>
-            <p className="text-slate-custom dark:text-gray-400">
-              {t("process_steps.subtitle")}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-            {/* Step 1 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
-                {t("process_steps.step_1.nro")}
-              </div>
-              <h4 className="font-bold">{t("process_steps.step_1.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
-                {t("process_steps.step_1.description")}
+        <section className="px-6 py-24 bg-white dark:bg-background-dark">
+          <div className="mx-auto max-w-[1200px]">
+            <div className="mb-16 text-center">
+              <h2 className="text-3xl font-black mb-4">
+                {t("process_steps.title")}
+              </h2>
+              <p className="text-slate-500 dark:text-gray-400">
+                {t("process_steps.subtitle")}
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
-                {t("process_steps.step_2.nro")}
+            <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-5">
+              {/* Step 1 */}
+              <div className="group relative flex flex-col items-center gap-6 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/30 p-8 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 text-center">
+                <div className="flex h-14 w-14 items-center justify-center  text-primary  mx-auto">
+                  
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2">
+                    {t("process_steps.step_1.title")}
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 px-0">
+                    {t("process_steps.step_1.description")}
+                  </p>
+                </div>
+                <span className="absolute -top-4 -right-4 text-6xl font-black text-slate-100 dark:text-gray-800 z-0 select-none">
+                  {t("process_steps.step_1.nro").padStart(2, "0")}
+                </span>
               </div>
-              <h4 className="font-bold">{t("process_steps.step_2.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
-                {t("process_steps.step_2.description")}
-              </p>
-            </div>
 
-            {/* Step 3 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
-                {t("process_steps.step_3.nro")}
+              {/* Step 2 */}
+              <div className="group relative flex flex-col items-center gap-6 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/30 p-8 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 text-center">
+                <div className="flex h-14 w-14 items-center justify-center  text-primary  mx-auto">
+                  
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2">
+                    {t("process_steps.step_2.title")}
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 px-0">
+                    {t("process_steps.step_2.description")}
+                  </p>
+                </div>
+                <span className="absolute -top-4 -right-4 text-6xl font-black text-slate-100 dark:text-gray-800 z-0 select-none">
+                  {t("process_steps.step_2.nro").padStart(2, "0")}
+                </span>
               </div>
-              <h4 className="font-bold">{t("process_steps.step_3.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
-                {t("process_steps.step_3.description")}
-              </p>
-            </div>
 
-            {/* Step 4 */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
-                {t("process_steps.step_4.nro")}
+              {/* Step 3 */}
+              <div className="group relative flex flex-col items-center gap-6 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/30 p-8 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 text-center">
+                <div className="flex h-14 w-14 items-center justify-center  text-primary  mx-auto">
+                  
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2">
+                    {t("process_steps.step_3.title")}
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 px-0">
+                    {t("process_steps.step_3.description")}
+                  </p>
+                </div>
+                <span className="absolute -top-4 -right-4 text-6xl font-black text-slate-100 dark:text-gray-800 z-0 select-none">
+                  {t("process_steps.step_3.nro").padStart(2, "0")}
+                </span>
               </div>
-              <h4 className="font-bold">{t("process_steps.step_4.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
-                {t("process_steps.step_4.description")}
-              </p>
-            </div>
 
-            {/* Step 5 (NUEVO) */}
-            <div className="text-center space-y-4 relative">
-              <div className="size-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-[#e6ebf4] dark:border-gray-800 flex items-center justify-center mx-auto text-2xl font-black text-primary">
-                {t("process_steps.step_5.nro")}
+              {/* Step 4 */}
+              <div className="group relative flex flex-col items-center gap-6 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/30 p-8 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 text-center">
+                <div className="flex h-14 w-14 items-center justify-center  text-primary  mx-auto">
+                  
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2">
+                    {t("process_steps.step_4.title")}
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 px-0">
+                    {t("process_steps.step_4.description")}
+                  </p>
+                </div>
+                <span className="absolute -top-4 -right-4 text-6xl font-black text-slate-100 dark:text-gray-800 z-0 select-none">
+                  {t("process_steps.step_4.nro").padStart(2, "0")}
+                </span>
               </div>
-              <h4 className="font-bold">{t("process_steps.step_5.title")}</h4>
-              <p className="text-sm text-slate-custom px-4">
-                {t("process_steps.step_5.description")}
-              </p>
+
+              {/* Step 5 */}
+              <div className="group relative flex flex-col items-center gap-6 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/30 p-8 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 text-center">
+                <div className="flex h-14 w-14 items-center justify-center  text-primary  mx-auto">
+                  
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2">
+                    {t("process_steps.step_5.title")}
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 px-0">
+                    {t("process_steps.step_5.description")}
+                  </p>
+                </div>
+                <span className="absolute -top-4 -right-4 text-6xl font-black text-slate-100 dark:text-gray-800 z-0 select-none">
+                  {t("process_steps.step_5.nro").padStart(2, "0")}
+                </span>
+              </div>
             </div>
           </div>
         </section>
@@ -632,16 +829,14 @@ export default function LandingPage() {
                 >
                   <path
                     fill="#434b51"
-                    d="M12 20q1.875 0 3.188-1.313T16.5 15.5q0-1.875-1.313-3.188T12 11q-1.875 0-3.188 1.313T7.5 15.5q0 1.875 1.313 3.188T12 20ZM9.075 9.7q.5-.275 1.063-.437t1.137-.213L8.75 4h-2.5l2.825 5.7ZM6.4 18.8q-.425-.725-.663-1.563T5.5 15.5q0-.9.238-1.738T6.4 12.2q-1.05.35-1.725 1.238T4 15.5q0 1.175.675 2.063T6.4 18.8Zm11.2 0q1.05-.35 1.725-1.238T20 15.5q0-1.175-.675-2.063T17.6 12.2q.425.725.663 1.563T18.5 15.5q0 .9-.238 1.738T17.6 18.8ZM12 22q-1 0-1.913-.288T8.4 20.925q-.225.05-.45.063T7.475 21Q5.2 21 3.6 19.4T2 15.525Q2 13.35 3.45 11.8t3.575-1.725l-3.3-6.625q-.25-.5.038-.975T4.625 2h4.15q.575 0 1.038.3t.737.8L12 6l1.45-2.9q.275-.5.738-.8t1.037-.3h4.15q.575 0 .863.475t.037.975L17 10.025q2.125.2 3.563 1.75T22 15.5q0 2.3-1.6 3.9T16.5 21q-.225 0-.463-.013t-.462-.062q-.775.5-1.675.788T12 22Zm0-6.5ZM9.075 9.7L6.25 4l2.825 5.7ZM12 16.85l-1.225.925q-.15.125-.3.013t-.1-.288l.475-1.525l-1.225-.875q-.15-.125-.1-.288t.25-.162h1.5l.475-1.625q.05-.175.25-.175t.25.175l.475 1.625h1.5q.2 0 .25.163t-.1.287l-1.225.875l.475 1.525q.05.175-.1.288t-.3-.013L12 16.85Zm2.925-7.15l2.85-5.7H15.25l-2.125 4.25l.475.95q.35.1.675.213t.65.287Z"
+                    d="M12 20q1.875 0 3.188-1.313T16.5 15.5q0-1.875-1.313-3.188T12 11q-1.875 0-3.188 1.313T7.5 15.5q0 1.875 1.313 3.188T12 20ZM9.075 9.7q.5-.275 1.063-.437t1.137-.213L8.75 4h-2.5l2.825 5.7ZM6.4 18.8q-.425-.725-.663-1.563T5.5 15.5q0-.9.238-1.738T6.4 12.2q-1.05.35-1.725 1.238T4 15.5q0 1.175.675 2.063T6.4 18.8Zm11.2 0q1.05-.35 1.725-1.238T20 15.5q0-1.175-.675-2.063T17.6 12.2q.425.725.663 1.563T18.5 15.5q0 .9-.238 1.738T17.6 18.8ZM12 22q-1 0-1.913-.288T8.4 20.925q-.225.05-.45.063T7.475 21Q5.2 21 3.6 19.4T2 15.525Q2 13.35 3.45 11.8t3.575-1.725l-3.3-6.625q-.25-.5.038-.975T4.625 2h4.15q.575 0 1.038.3t.737.8L12 6l1.45-2.9q.275-.5.738-.8t1.037-.3h4.15q.575 0 .863.475t.037.975L17 10.025q2.125.2 3.563 1.75T22 15.5q0 2.3-1.6 3.9T16.5 21q-.225 0-.463-.013t-.462-.062q-.775.5-1.675.788T12 22Zm0-6.5ZM9.075 9.7L6.25 4l2.825 5.7ZM12 16.85l-1.225.925q-.15.125-.3.013t-.1-.288l.475-1.525l-1.225-.875q-.15-.125-.1-.288t.25-.162h1.5l.475-1.625q.05-.175.25-.175t.25.175l.475 1.625h1.5q.2 0 .25.163t-.1.287l-1.225.875l.475.95q.35.1.675.213t.65.287Zm2.925-7.15l2.85-5.7H15.25l-2.125 4.25l.475.95q.35.1.675.213t.65.287Z"
                   />
                 </svg>
               </span>
               <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
                 <PeopleGroup />
               </span>
-              <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer">
-
-              </span>
+              <span className="material-symbols-outlined text-slate-custom hover:text-primary cursor-pointer"></span>
             </div>
           </div>
           <div className="space-y-4">
@@ -736,7 +931,8 @@ export default function LandingPage() {
 
         <div className="max-w-[1280px] mx-auto mt-12 pt-8 border-t border-[#e6ebf4] dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-custom">
-            © {new Date().getFullYear()} VentasYa. {t("common.all_rights_reserved")}.
+            © {new Date().getFullYear()} VentasYa.{" "}
+            {t("common.all_rights_reserved")}.
           </p>
           <div className="flex items-center gap-6 text-xs text-slate-custom">
             <a className="hover:text-primary" href="#">

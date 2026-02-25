@@ -2,9 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Poppins, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ShippingProvider } from "@/src/core/contexts/shipping-context"
-import { AuthProvider } from "@/src/core/contexts/auth-context"
-import { I18nProvider } from "@/src/i18n/i18n"
+import { ClientWrapper } from "@/src/core/providers/client-wrapper"
+import { Toaster } from "sileo"
 import "../../styles/globals.css"
 
 const poppins = Poppins({
@@ -45,13 +44,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
-        <I18nProvider>
-          <AuthProvider>
-            <ShippingProvider>
-              {children}
-            </ShippingProvider>
-          </AuthProvider>
-        </I18nProvider>
+        <ClientWrapper>
+          {children}
+        </ClientWrapper>
+        <Toaster position="top-center" />
         <Analytics/>
       </body>
     </html>

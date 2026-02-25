@@ -65,7 +65,6 @@ jobs:
           cat <<EOF > next.config.js
           /** @type {import('next').NextConfig} */
           const nextConfig = {
-            output: 'export',
             distDir: 'out',
             basePath: '/$REPO_NAME/ventasya-internacional',
             assetPrefix: '/$REPO_NAME',

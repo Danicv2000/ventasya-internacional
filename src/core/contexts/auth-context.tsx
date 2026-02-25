@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { supabase } from '@/src/lib/supabase-client'
+import { supabase, isSupabaseConfigured } from '@/src/lib/supabase-client'
 import { Session, User } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -35,9 +35,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Handle auth state changes
   useEffect(() => {
+    if (!supabase || !isSupabaseConfigured()) {
+      logDebug('Supabase not configured, skipping auth setup')
+      return
+    }
+    
     logDebug('Setting up auth state listener')
     
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase!.auth.onAuthStateChange(
       (event, session) => {
         logDebug(`Auth state changed: ${event}`, {
           event,
@@ -61,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     )
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase!.auth.getSession().then(({ data: { session } }) => {
       logDebug('Initial session check result:', {
         hasSession: !!session,
         userId: session?.user?.id,
@@ -85,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase!.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password
       })
@@ -129,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signOut()
+      const { error } = await supabase!.auth.signOut()
       
       logDebug('Logout result:', { error: error?.message })
       
@@ -156,7 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabase!.auth.signUp({
         email: credentials.email,
         password: credentials.password
       })

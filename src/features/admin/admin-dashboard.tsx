@@ -12,7 +12,7 @@ import { CalculationSettings } from "@/src/features/calculator/calculation-setti
 import { ConsolidatedShipping } from "@/src/features/tracking/consolidated-shipping"
 import { useAuth } from "@/src/core/contexts/auth-context"
 import { sileo } from "sileo"
-import { supabase } from "@/src/lib/supabase-client"
+import { supabase, isSupabaseConfigured } from "@/src/lib/supabase-client"
 import Link from "next/link"
 
 // Type for orders from Supabase
@@ -66,6 +66,12 @@ export function AdminDashboard() {
   }, [])
 
   const fetchOrders = async () => {
+    if (!supabase || !isSupabaseConfigured()) {
+      sileo.error({ title: 'Supabase no está configurado' })
+      setLoading(false)
+      return
+    }
+    
     try {
       // Fetch orders with client info
       const { data: ordersData, error } = await supabase

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/src/lib/supabase-client";
+import { supabase, isSupabaseConfigured } from "@/src/lib/supabase-client";
 import { sileo } from "sileo";
 import {
   Dialog,
@@ -216,11 +216,16 @@ export function CreateOrderModal({
   };
 
   const handleSave = async () => {
+    if (!supabase || !isSupabaseConfigured()) {
+      sileo.error({ title: 'Supabase no está configurado. Configura las variables de entorno.' })
+      return
+    }
+    
     const orderNumber = `ORD-${Date.now()}`;
     try {
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = await supabase!.auth.getSession();
 
       // First, create or get the client
       const clientData = {
@@ -232,7 +237,7 @@ export function CreateOrderModal({
       };
 
       // Check if client already exists by phone
-      const { data: existingClient } = await supabase
+      const { data: existingClient } = await supabase!
         .from('clients')
         .select('id')
         .eq('phone', formData.clientPhone)
@@ -242,7 +247,7 @@ export function CreateOrderModal({
 
       // If client doesn't exist, create them
       if (!clientId) {
-        const { data: newClient, error: clientError } = await supabase
+        const { data: newClient, error: clientError } = await supabase!
           .from('clients')
           .insert([clientData])
           .select('id')
@@ -287,7 +292,7 @@ export function CreateOrderModal({
       };
 
       // Save to Supabase
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from("orders")
         .insert([orderData])
         .select("*")

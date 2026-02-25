@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  // output: 'export', // Removed to allow dynamic API routes
-  distDir: 'out',
+  // output: 'export', // Static export mode
+  // distDir: 'out', // Removed - conflicts with dynamic API routes
   basePath: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional' : '',
   assetPrefix: process.env.ENVIROMENTS === 'test' ? '/ventasya-internacional/' : '',
   trailingSlash: process.env.ENVIROMENTS === 'test' ? true : false,

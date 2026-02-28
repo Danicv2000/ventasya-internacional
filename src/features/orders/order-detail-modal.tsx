@@ -10,7 +10,7 @@ import { Input } from "@/src/shared/ui/input"
 import { useState } from "react"
 import { Package, MapPin, DollarSign } from "lucide-react"
 import { TemuIcon, SheinIcon, AmazonIcon } from '@/src/features/common/platform-icons'
-import { sileo } from "sileo"
+import { toast } from "@/src/shared/hooks/use-toast"
 
 interface Order {
   id: string
@@ -45,7 +45,7 @@ export function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
   const [adminNotes, setAdminNotes] = useState("")
 
   const handleSave = () => {
-    sileo.success({ title: 'Pedido actualizado correctamente' })
+    toast.success('Pedido actualizado correctamente')
     onClose()
   }
 

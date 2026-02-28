@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "@/src/lib/supabase-client";
-import { sileo } from "sileo";
+import { toast } from "@/src/shared/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -217,12 +217,14 @@ export function CreateOrderModal({
 
   const handleSave = async () => {
     if (!supabase || !isSupabaseConfigured()) {
-      sileo.error({ title: 'Supabase no está configurado. Configura las variables de entorno.' })
+      toast.error('Supabase no está configurado. Configura las variables de entorno.')
       return
     }
     
     const orderNumber = `ORD-${Date.now()}`;
-    try {
+    
+    // Create a promise that wraps the entire save logic
+    const saveOrderPromise = async () => {
       const {
         data: { session },
       } = await supabase!.auth.getSession();
@@ -255,8 +257,7 @@ export function CreateOrderModal({
 
         if (clientError) {
           console.error('Error creating client:', clientError);
-          sileo.error({ title: 'Error al crear cliente' });
-          return;
+          throw new Error('Error al crear cliente');
         }
         clientId = newClient?.id;
       }
@@ -303,34 +304,27 @@ export function CreateOrderModal({
           error.message.includes("relation") &&
           error.message.includes("does not exist")
         ) {
-          sileo.error({
-            title: "Error: La tabla de pedidos no existe",
-            fill: "#171717",
-          });
+          throw new Error("Error: La tabla de pedidos no existe");
         } else if (error.message.includes("duplicate key")) {
-          sileo.error({
-            title: "Error: Ya existe un pedido con este número",
-            fill: "#171717",
-          });
+          throw new Error("Error: Ya existe un pedido con este número");
         } else {
-          sileo.error({
-            title: "Error al guardar: " + error.message,
-            fill: "#171717",
-          });
+          throw new Error("Error al guardar: " + error.message);
         }
-        return;
       }
 
-      sileo.success({
-        title: "Pedido " + orderNumber + " guardado exitosamente!",
-        fill: "#171717",
+      return { ...orderData, id: data?.id };
+    };
+
+    try {
+      // Use toast.promise to show loading state
+      const result = await toast.promise(saveOrderPromise(), {
+        loading: "Guardando pedido...",
+        success: "Pedido " + orderNumber + " guardado exitosamente!",
+        error: "Error al guardar el pedido"
       });
 
       // Call onSave with local data (for any local state updates)
-      onSave({
-        ...orderData,
-        id: data?.[0]?.id,
-      });
+      onSave(result);
 
       onClose();
       setFormData({
@@ -351,9 +345,9 @@ export function CreateOrderModal({
           store: "",
         },
       ]);
-      setPriceBreakdown(null);
     } catch (error) {
-      sileo.error({ title: "Error al procesar el pedido" });
+      // Error is already handled by toast.promise
+      console.error("Error saving order:", error);
     }
   };
 

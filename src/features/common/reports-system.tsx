@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/src/shared/ui/button"
 import { BarChart, TrendingUp, DollarSign, Package, Download } from "lucide-react"
 import { Badge } from "@/src/shared/ui/badge"
-import { sileo } from "sileo"
+import { toast } from "@/src/shared/hooks/use-toast"
 import { TemuIcon, SheinIcon, AmazonIcon } from '@/src/features/common/platform-icons'
 
 // Mock data for reports
@@ -42,7 +42,7 @@ export function ReportsSystem() {
 
   const handleExport = () => {
     console.log("[v0] Exporting report for period:", selectedPeriod)
-    sileo.success({ title: 'Reporte exportado exitosamente' })
+    toast.success('Reporte exportado exitosamente')
   }
 
   return (

@@ -18,7 +18,6 @@ import {
   Star,
   ShieldCheck,
   AlertTriangle,
-  PackageCheckIcon,
 } from "lucide-react";
 import { useI18n } from "@/src/shared/hooks/use-i18n";
 import { useExchangeRate } from "@/src/shared/hooks/use-exchange-rate";

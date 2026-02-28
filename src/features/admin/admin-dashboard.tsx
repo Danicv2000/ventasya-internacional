@@ -11,7 +11,7 @@ import { CreateOrderModal } from "@/src/features/orders/create-order-modal"
 import { CalculationSettings } from "@/src/features/calculator/calculation-settings"
 import { ConsolidatedShipping } from "@/src/features/tracking/consolidated-shipping"
 import { useAuth } from "@/src/core/contexts/auth-context"
-import { sileo } from "sileo"
+import { toast } from "@/src/shared/hooks/use-toast"
 import { supabase, isSupabaseConfigured } from "@/src/lib/supabase-client"
 import Link from "next/link"
 
@@ -67,7 +67,7 @@ export function AdminDashboard() {
 
   const fetchOrders = async () => {
     if (!supabase || !isSupabaseConfigured()) {
-      sileo.error({ title: 'Supabase no está configurado' })
+      toast.error('Supabase no está configurado')
       setLoading(false)
       return
     }
@@ -81,7 +81,7 @@ export function AdminDashboard() {
 
       if (error) {
         console.error('Error fetching orders:', error)
-        sileo.error({ title: 'Error al cargar pedidos' })
+        toast.error('Error al cargar pedidos')
         return
       }
 
@@ -131,8 +131,7 @@ export function AdminDashboard() {
   const deliveredOrders = orders.filter((o) => o.status === 'delivered').length
 
   const handleCreateOrder = (orderData: any) => {
-    sileo.success({ title: 'Pedido creado exitosamente' })
-    // Refresh orders list
+    // Refresh orders list - the success toast is shown by create-order-modal
     fetchOrders()
   }
 

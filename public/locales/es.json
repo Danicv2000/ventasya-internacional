@@ -52,6 +52,13 @@
       },
       "description": "Estamos afinando los últimos detalles para que compres en el mundo desde Cuba como nunca antes.",
       "security": "Seguridad"
+    },
+    "toast": {
+      "success": "Éxito",
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Información",
+      "loading": "Cargando..."
     }
   },
   "navigation": {
